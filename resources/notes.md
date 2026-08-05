@@ -1,16 +1,16 @@
 # <span style="color: cyan;"> ft_irc </span> #
 
-Le projet ft_irc est dans le but de coder un serveur IRC, c'est à dire un gestionnaire de chat en ligne entre client et serveur. 
+	Le projet ft_irc est dans le but de coder un serveur IRC, c'est à dire un gestionnaire de chat en ligne entre client et serveur. 
 
-L'IP dit OÙ envoyer les données (la machine).
-Le Port dit À QUI les donner sur cette machine (l'application).
-Le Socket est le CANAL OUVERT (IP + Port) qui permet la connexion effective entre deux programmes.
- 
-Le serveur suit ce cycle de vie :
-	socket() $\rightarrow$ bind() $\rightarrow$ listen() $\rightarrow$ accept() $\rightarrow$ read() / write().
+	L'IP dit OÙ envoyer les données (la machine).
+	Le Port dit À QUI les donner sur cette machine (l'application).
+	Le Socket est le CANAL OUVERT (IP + Port) qui permet la connexion effective entre deux programmes.
+	
+	Le serveur suit ce cycle de vie :
+		socket() $\rightarrow$ bind() $\rightarrow$ listen() $\rightarrow$ accept() $\rightarrow$ read() / write().
 
-Le client suit ce cycle de vie :
-	socket() $\rightarrow$ connect() $\rightarrow$ write() / read().
+	Le client suit ce cycle de vie :
+		socket() $\rightarrow$ connect() $\rightarrow$ write() / read().
 
 ## <span style="color: cyan"> Socket </span> ##
 
