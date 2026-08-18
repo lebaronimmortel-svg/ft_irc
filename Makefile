@@ -1,4 +1,4 @@
-SRC = src/main.cpp src/Client/Client.cpp src/Channel/Channel.cpp
+SRC = src/main.cpp src/Client/Client.cpp src/Channel/Channel.cpp src/Utils/Parser.cpp
 NAME = ft_ircserv
 CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
 OBJ = $(SRC:%.cpp=%.o)
