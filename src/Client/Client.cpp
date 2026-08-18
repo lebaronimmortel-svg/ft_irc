@@ -1,65 +1,65 @@
-#include "../../includes/Client.hpp"
+#include "../../includes/Header.hpp"
 
 Client::Client() {}
 
-Client::~Client {}
+Client::~Client() {}
 
-Client::getNickName()
+std::string Client::getNickName()
 {
     return _nickname;
 }
 
-Client::getFullName()
+std::string Client::getFullName()
 {
     return _fullname;
 }
 
-Client::getUserName()
+std::string Client::getUserName()
 {
     return _username;
 }
 
-Client::getAuthenticated()
+bool Client::getAuthenticated()
 {
     return _authenticated;
 }
 
-Client::getFd()
+int Client::getFd()
 {
     return _fd;
 }
 
-Client::getBuffer()
+std::string Client::getBuffer()
 {
     return _buffer;
 }
 
-Client::setNickName(std::string nickname)
+void Client::setNickName(std::string nickname)
 {
     _nickname = nickname;
 }
 
-Client::setFullName(std::string fullname)
+void Client::setFullName(std::string fullname)
 {
     _fullname = fullname;
 }
 
-Client::setUserName(std::string username)
+void Client::setUserName(std::string username)
 {
     _username = username;
 }
 
-Client::setAuthenticated(bool authenticated)
+void Client::setAuthenticated(bool authenticated)
 {
     _authenticated = authenticated;
 }
 
-Client::setFd(int fd)
+void Client::setFd(int fd)
 {
     _fd = fd;
 }
 
-Client::setBuffer(std::string buffer)
+void Client::setBuffer(std::string buffer)
 {
     _buffer = buffer;
 }

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Client.hpp"
 #include "Header.hpp"
+
+class Client;
 
 class Channel
 {
@@ -36,26 +37,28 @@ class Channel
         ~Channel();
 
         // getters
-        std::string getName();
-        std::string getPassword();
-        Client*     getMember(std::string username);
-        Client*     getModerator(std::string username);
-        Client*     getInvited(std::string username);
-        bool        getPasswordRequirement();
-        bool        getInviteOnlyStatus();
-        bool        getTopicRestrictionStatus();
-        std::string getTopic();
-        std::string getTopicLastModifDate();
-        std::string getTopicLastModifierUsername();
+        std::string  getName();
+        std::string  getPassword();
+        Client*      getMember(std::string username);
+        Client*      getModerator(std::string username);
+        Client*      getInvited(std::string username);
+        bool         getPasswordRequirement();
+        bool         getInviteOnlyStatus();
+        bool         getTopicRestrictionStatus();
+        std::string  getTopic();
+        std::string  getTopicLastModifDate();
+        std::string  getTopicLastModifierUsername();
+        unsigned int getUserLimit();
 
         // setters
-        void        setName(std::string name);
-        void        setPassword(std::string password);
-        void        setPasswordRequirement(bool status);
-        void        setInviteOnlyStatus(bool status);
-        void        setTopicRestrictionStatus(bool status);
-        void        setTopic(std::string topic);
-        void        setTopicLastModifDate(std::string date);
-        void        setTopicLastModifierUsername(std::string username);
+        void         setName(std::string name);
+        void         setPassword(std::string password);
+        void         setPasswordRequirement(bool status);
+        void         setInviteOnlyStatus(bool status);
+        void         setTopicRestrictionStatus(bool status);
+        void         setTopic(std::string topic);
+        void         setTopicLastModifDate(std::string date);
+        void         setTopicLastModifierUsername(std::string username);
+        void         setUserLimit(unsigned int limit);
 };
 

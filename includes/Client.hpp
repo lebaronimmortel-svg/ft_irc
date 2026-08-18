@@ -4,15 +4,14 @@
 
 class Client
 {
-
     private :
     
-    	// used to authenticate
+    	// identifier in the server
         std::string _nickname;
-        std::string _fullname;
         
-        // identifier in the server
+        // used to authenticate
         std::string _username;
+        std::string _fullname;
         
         // status in the server 
         bool _authenticated;

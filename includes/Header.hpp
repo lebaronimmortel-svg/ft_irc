@@ -1,4 +1,8 @@
+#pragma once
+
+#include <map>
 #include <iostream>
-#include <sys/socket>
+#include "Channel.hpp"
+#include "Client.hpp"
 
 

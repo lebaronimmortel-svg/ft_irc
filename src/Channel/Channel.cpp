@@ -29,72 +29,82 @@ Client* Channel::getInvited(std::string username)
     return _invited.at(username);
 }
 
-bool getPasswordRequirement()
+bool Channel::getPasswordRequirement()
 {
     return _requires_password;
 }
 
-bool getInviteOnlyStatus()
+bool Channel::getInviteOnlyStatus()
 {
     return _invite_only_mod;
 }
 
-bool getTopicRestrictionStatus()
+bool Channel::getTopicRestrictionStatus()
 {
     return _topic_restriction; 
 }
 
-std::string getTopic()
+std::string Channel::getTopic()
 {
     return _topic;
 }
 
-std::string getTopicLastModifDate()
+std::string Channel::getTopicLastModifDate()
 {
     return _topic_last_modif_date;
 }
 
-std::string getTopicLastModifierUsername()
+std::string Channel::getTopicLastModifierUsername()
 {
     return _topic_last_modifier_username;
 }
 
-void    setName(std::string name)
+unsigned int Channel::getUserLimit()
+{
+    return _user_limit;
+}
+
+void    Channel::setName(std::string name)
 {
     _name = name;
 }
 
-void    setPassword(std::string password)
+void    Channel::setPassword(std::string password)
 {
     _password = password;
 }
 
-void    setPasswordRequirement(bool status)
+void    Channel::setPasswordRequirement(bool status)
 {
     _requires_password = status;
 }
 
-void    setInviteOnlyStatus(bool status)
+void    Channel::setInviteOnlyStatus(bool status)
 {
     _invite_only_mod = status;
 }
 
-void    setTopicRestrictionStatus(bool status)
+void    Channel::setTopicRestrictionStatus(bool status)
 {
     _topic_restriction = status;
 }
 
-void    setTopic(std::string topic)
+void    Channel::setTopic(std::string topic)
 {
     _topic = topic;
 }
 
-void    setTopicLastModifDate(std::string date)
+void    Channel::setTopicLastModifDate(std::string date)
 {
     _topic_last_modif_date = date;
 }
 
-void    setTopicLastModifierUsername(std::string username)
+void    Channel::setTopicLastModifierUsername(std::string username)
 {
     _topic_last_modifier_username = username;
+}
+
+void    Channel::setUserLimit(unsigned int limit)
+{
+    _user_limit = limit;
 }
