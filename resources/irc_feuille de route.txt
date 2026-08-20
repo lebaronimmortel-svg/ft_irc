@@ -1,0 +1,77 @@
+Ce que j'ai compris du projet ft_irc au 19 aout 2026
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Le serveur, c'est le programme qui DIRIGE la communication entre les CLIENTS.
+
+Un client envoie de la donnée au serveur via internet (par exemple un message).
+
+Celle-ci est envoyée aux autres clients du même canal de communication.
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Au demarrage, le serveur ouvre un accès général pour tout nouveau client.
+
+Une fois celui-ci authentifié, il est alors redirigé vers un accès plus restreint.
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Au lancement du serveur, il se passe les choses suivantes :
+
+	- on crée le pollfd général qu'on met dans notre conteneur de pollfd
+	- on rentre dans la boucle infinie
+	- on appelle la fonction poll() sur notre conteneur de pollfd
+	- on vérifie le champ revents de chaque pollfd de notre conteneur pour 
+		savoir si il ya eu des requêtes entrantes
+		-> pollfd général : accepter et rediriger les nouveaux clients connectés...
+		-> pollfd quelconque : rejoindre un canal, envoyer un message, se déconnecter...
+		
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Debrief de Gemini
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Voici le détail des points forts et des éléments inexacts de ton résumé :
+
+Ce qui est très bien compris (tes points forts)
+Le rôle central du serveur : tu as parfaitement saisi que le serveur est 
+le chef d'orchestre qui reçoit, traite et réachemine la donnée.
+
+La boucle d'événements et poll() : la logique globale (création du pollfd d'écoute, appel à poll(), 
+vérification sélective de revents, différenciation serveur/clients) est limpide et exacte.
+
+Le cycle de traitement des données : détecter l'activité, lire avec recv(), puis parser pour agir en conséquence.
+
+Les 3 inexactitudes majeures (ce qui coûte les 3 points)
+1. L'attribution du pollfd se fait AVANT l'authentification
+Dans ton texte, tu écris :
+
+« si l'authentification réussit, il est redirigé -> on lui attribue un pollfd spécifique »
+
+En réseau, c'est l'inverse :
+
+Dès que la connexion TCP arrive sur le socket général, tu fais accept(). 
+Cela te donne immédiatement le nouveau fd du client.
+
+Tu crées son pollfd et tu l'ajoutes tout de suite à ton conteneur _pfds.
+
+C'est seulement après, via ce nouveau pollfd, que le client peut t'envoyer les commandes IRC 
+d'authentification (PASS, NICK, USER). Tu ne peux pas recevoir son mot de passe ou son 
+pseudo sans avoir déjà créé son descripteur dédié.
+
+2. Le concept de « redirection » n'existe pas en TCP/sockets
+Tu mentionnes une « redirection vers un accès plus restreint ».
+En réalité, il n'y a aucune redirection de socket. Le client reste connecté sur le même fd du début à la fin.
+La restriction d'accès est purement logique dans ton code (par exemple un booléen is_registered = false dans ton objet Client 
+qui bloque l'exécution des autres commandes tant que l'enregistrement n'est pas complet).
+
+3. Un client non présent sur un canal peut quand même envoyer des messages
+Tu écris :
+
+« tant qu'il n'a pas envoyé la requête de rejoindre un canal, il ne peut pas envoyer de messages »
+
+Sur IRC, un client authentifié n'a pas besoin d'être sur un canal pour communiquer : 
+il peut envoyer des messages privés directs à un autre utilisateur (PRIVMSG alice :salut). 
+Les canaux ne sont qu'une fonctionnalité parmi d'autres, pas un prérequis pour parler.
+
