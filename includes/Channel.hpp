@@ -60,5 +60,8 @@ class Channel
         void         setTopicLastModifDate(std::string date);
         void         setTopicLastModifierUsername(std::string username);
         void         setUserLimit(unsigned int limit);
+
+        void        addModerator(Client *);
+        void        delModerator(Client *);
 };
 

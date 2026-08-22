@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/20 15:41:23 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/23 00:26:04 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,38 @@ inline const sockaddr_in Server::getAddress() const {return this->_servaddr;};
 cmdfunc Server::getcmd(std::string str){
 	int slash = str.find('/');
 	if (!slash)
-		return unknowncmd;
+		return NULL;
 	int sep = str.find(slash, ' ');
 	if (sep == str.npos)
 		sep = str.length();
 	std::string cmd = str.substr(slash, sep);
-	for (int i = 0; i < UNKNOWN; i++){
+	for (int i = 0; i < PRIVMSG + 1; i++){
 		if (cmd ==  cmdLU[i].name)
 			return cmdLU[i].call;
 	}
-	return (unknowncmd);
+	return (NULL);
+}
+
+int Server::callcmd(std::string str, Client &c){
+	cmdfunc func = this->getcmd(str);
+	if (!func)
+	{
+		// return error
+	}
+	int i = str.find(' ');
+	if (str[i + 1] != '#')
+	{
+		// return error
+	}
+	int end = str.find(' ', i + 1);
+	if (end == str.npos)
+		end = str.length() - i;
+	std::string name = str.substr(i, end);
+	const Channel &chan = this->getChannel(name);
+	if (!&chan)
+	{
+		// return error
+	}
+	std::string sub = &str[end];
+	func(sub, c, const_cast<Channel &>(chan));
 }

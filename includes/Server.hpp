@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "Command.hpp"
 
 #define MAX_EVENT 10
 #define TIMEOUT 180000
@@ -19,79 +20,7 @@
 	#endif
 #endif
 
-typedef int (* cmdfunc)(std::string &str, Client &);
 
-int invite(std::string &str, Client &);
-int kick(std::string &str, Client &);
-int topic(std::string &str, Client &);
-int mode(std::string &str, Client &);
-int pass(std::string &str, Client &);
-int nick(std::string &str, Client &);
-int name(std::string &str, Client &);
-int join(std::string &str, Client &);
-int privmsg(std::string &str, Client &);
-int unknowncmd(std::string &str, Client &);
-
-enum cmdlistenum {
-    INVITE,
-    KICK,
-    TOPIC,
-    MODE,
-    PASS,
-    NICK,
-    NAME,
-    JOIN,
-    PRIVMSG,
-    UNKNOWN
-};
-
-struct cmdlist {
-    char *name;
-    cmdfunc call;
-};
-
-cmdlist cmdLU[] = {
-    [INVITE] = {
-        .name = "invite",
-        .call = invite,
-    },
-    [KICK] = {
-        .name = "kick",
-        .call = kick,
-    },
-    [TOPIC] = {
-        .name = "topic",
-        .call = topic,
-    },
-    [MODE] = {
-        .name = "mode",
-        .call = mode,
-    },
-    [PASS] = {
-        .name = "pass",
-        .call = pass,
-    },
-    [NICK] = {
-        .name = "nick",
-        .call = nick,
-    },
-    [NAME] = {
-        .name = "name",
-        .call = name,
-    },
-    [JOIN] = {
-        .name = "join",
-        .call = join,
-    },
-    [PRIVMSG] = {
-        .name = "privmsg",
-        .call = privmsg,
-    },
-    [UNKNOWN] = {
-        .name = "",
-        .call = unknowncmd,
-    }
-};
 
 class Server
 {
@@ -114,7 +43,8 @@ class Server
         ~Server();
 
         // getters
-        inline const Channel* getChannel() const;
+        inline const Channel &getChannel() const;
+        inline const Channel &getChannel(std::string str) const;
         inline const std::string getPassword() const;
         inline const int getEpollFd() const;
         inline const int getSocket() const;
@@ -123,4 +53,5 @@ class Server
         // setters
         void    setPassword(std::string password);
         cmdfunc   getcmd(std::string str);
+        int        callcmd(std::string str, Client &);
 };

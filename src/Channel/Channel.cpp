@@ -108,3 +108,16 @@ void    Channel::setUserLimit(unsigned int limit)
 {
     _user_limit = limit;
 }
+
+void Channel::addModerator(Client *c){
+    this->_moderators[c->getNickName()] = c; 
+}
+
+void Channel::delModerator(Client *c){
+    try {
+        this->_moderators.at(c->getNickName());
+        this->_moderators.erase(c->getNickName());
+    } catch (std::exception &e){
+        return ;
+    }
+}

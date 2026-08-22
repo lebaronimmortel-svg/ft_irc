@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/22 14:49:45 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/22 23:26:20 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 void add_order(bool state, std::string &order, char c){
 	int find = order.find(c); 
 	if (!state){
+		if (c == 'k')
+			return ;
 		if (find != order.npos)
 			order.erase(find);
 	} else {
@@ -42,18 +44,30 @@ std::string get_word(std::string str, int &i, bool &end){
 	return (str.substr(start, i));
 }
 
+bool have_right(Client &c, Channel &chan){
+	if (c.getAuthenticated()){
+		return chan.getModerator(c.getNickName());
+	}
+	return (false);
+}
+
 mode_s *get_arg(std::string str){
 	mode_s *args = new mode_s();
+	args->flag.i = -1;
+	args->flag.t = -1;
+	args->flag.k = -1;
+	args->flag.o = -1;
+	args->flag.l = -1;
 	size_t lenght = str.length();
-	bool state = false;
+	short state = 0;
 	bool init_state = false;
 	std::string order = "";
 	int i = 0;
 	for (; i < lenght; i++){
 		if (str[i] == '+')
-			state = true;
+			state = 1;
 		else if (str[i] == '-')
-			state = false;
+			state = 0;
 		else if (str[i] == ' ')
 			break;
 		else if (!init_state || strchr("itkol", str[i]) == NULL)
@@ -116,4 +130,44 @@ mode_s *get_arg(std::string str){
 		}
 	}
 	return (args);
+}
+
+int mode(std::string str, Client &c, Channel &chan){
+	if (have_right(c, chan)){
+		mode_s *args = get_arg(str);
+		if (args->flag.i == 1){
+			chan.setInviteOnlyStatus(true);
+		}
+		if (args->flag.t == 1){
+			chan.setTopicRestrictionStatus(true);
+		}
+		if (args->flag.k == 1){
+			chan.setPasswordRequirement(true);
+			chan.setPassword(args->value.k);
+		}
+
+		else if  (args->flag.l == 0)
+			chan.setUserLimit(0);
+		if (args->flag.o == 1){
+
+			for (int i = 0; i < args->value.o.size(); i++){
+				Client *client = chan.getMember(args->value.o.at(i));
+				if (client != NULL)
+					chan.addModerator(client);
+			}
+		}
+		else if (args->flag.o == 0){
+			for (int i = 0; i < args->value.o.size(); i++){
+				Client *client = chan.getMember(args->value.o.at(i));
+				if (client != NULL)
+					chan.delModerator(client);
+			}
+		}
+		else if (args->flag.k == 0){
+			chan.setPasswordRequirement(false);
+		}
+		if (args->flag.l = 1){
+			chan.setUserLimit(args->value.l);
+		}
+	}
 }
