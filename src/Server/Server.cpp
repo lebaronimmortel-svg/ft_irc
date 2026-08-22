@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/19 23:55:11 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/20 15:41:23 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,3 +49,18 @@ Server::Server(int port, std::string pass): _password(pass){
 inline const int Server::getEpollFd() const {return this->_epollfd;};
 inline const int Server::getSocket() const {return this->_servsock;};
 inline const sockaddr_in Server::getAddress() const {return this->_servaddr;};
+
+cmdfunc Server::getcmd(std::string str){
+	int slash = str.find('/');
+	if (!slash)
+		return unknowncmd;
+	int sep = str.find(slash, ' ');
+	if (sep == str.npos)
+		sep = str.length();
+	std::string cmd = str.substr(slash, sep);
+	for (int i = 0; i < UNKNOWN; i++){
+		if (cmd ==  cmdLU[i].name)
+			return cmdLU[i].call;
+	}
+	return (unknowncmd);
+}

@@ -19,6 +19,79 @@
 	#endif
 #endif
 
+typedef int (* cmdfunc)(std::string &str, Client &);
+
+int invite(std::string &str, Client &);
+int kick(std::string &str, Client &);
+int topic(std::string &str, Client &);
+int mode(std::string &str, Client &);
+int pass(std::string &str, Client &);
+int nick(std::string &str, Client &);
+int name(std::string &str, Client &);
+int join(std::string &str, Client &);
+int privmsg(std::string &str, Client &);
+int unknowncmd(std::string &str, Client &);
+
+enum cmdlistenum {
+    INVITE,
+    KICK,
+    TOPIC,
+    MODE,
+    PASS,
+    NICK,
+    NAME,
+    JOIN,
+    PRIVMSG,
+    UNKNOWN
+};
+
+struct cmdlist {
+    char *name;
+    cmdfunc call;
+};
+
+cmdlist cmdLU[] = {
+    [INVITE] = {
+        .name = "invite",
+        .call = invite,
+    },
+    [KICK] = {
+        .name = "kick",
+        .call = kick,
+    },
+    [TOPIC] = {
+        .name = "topic",
+        .call = topic,
+    },
+    [MODE] = {
+        .name = "mode",
+        .call = mode,
+    },
+    [PASS] = {
+        .name = "pass",
+        .call = pass,
+    },
+    [NICK] = {
+        .name = "nick",
+        .call = nick,
+    },
+    [NAME] = {
+        .name = "name",
+        .call = name,
+    },
+    [JOIN] = {
+        .name = "join",
+        .call = join,
+    },
+    [PRIVMSG] = {
+        .name = "privmsg",
+        .call = privmsg,
+    },
+    [UNKNOWN] = {
+        .name = "",
+        .call = unknowncmd,
+    }
+};
 
 class Server
 {
@@ -26,12 +99,14 @@ class Server
 
         // channels
         std::map<std::string, Channel*> _channels;
-        
+        std::map<int, Client *> _clientlist;
+
         // password for the channel
         std::string _password;
         int _servsock;
         int _epollfd;
         sockaddr_in _servaddr;
+
 
     public :
 
@@ -47,4 +122,5 @@ class Server
 
         // setters
         void    setPassword(std::string password);
+        cmdfunc   getcmd(std::string str);
 };
