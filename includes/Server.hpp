@@ -36,6 +36,10 @@ class Server
         int _epollfd;
         sockaddr_in _servaddr;
 
+        std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
+        Channel *getChannelparse(std::string &str, int &i);
+        std::vector<Channel *> *getChannelListparse(std::string &str, int &i, int *fail);
+
     public :
 
         Server(int port, std::string pass);
@@ -57,11 +61,6 @@ class Server
         Client	*get_client(std::string username, int fd, int mode);
         cmdfunc	getcmd(std::string str);
         int		callcmd(std::string str, Client &);
-
-        std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
-        Channel *getChannelparse(std::string &str, int &i);
-        std::vector<Channel *> *getChannelListparse(std::string &str, int &i, int *fail);
-
 
         //command
         void invite(std::string &str, int &i, Client &);
