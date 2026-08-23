@@ -76,5 +76,6 @@ int Client::is_chan_member()
 
 void Client::addChannel(Channel* chan)
 {
-    _channels.insert(std::make_pair(chan->getName(), chan));
+    /// if (std::find(<chan->getName(), chan>) != _channels.end())
+     _channels.insert(std::make_pair(chan->getName(), chan));
 }

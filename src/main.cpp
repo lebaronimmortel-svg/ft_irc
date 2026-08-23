@@ -72,34 +72,36 @@ int main(int argc, char** argv)
 					}
 				}
 				else // traiter la commande
-				{
-					// cmd channel
-					std::string cmd = chan_join_cmd(buf);
-					if (!cmd.empty())
+				{		
+					if (!ft_strncmp(buf, "JOIN ", 5))
 					{
-						Channel *chan = serv.get_channel(cmd);
-						if (!chan)
+						// cmd channel
+						std::string cmd = chan_join_cmd(buf);
+						if (!cmd.empty())
 						{
-							chan = new Channel(cmd);
-							serv.addChannel(chan, cmd);
+							Channel *chan = serv.get_channel(cmd);
+							if (!chan)
+							{
+								chan = new Channel(cmd);
+								serv.addChannel(chan, cmd);
+							}
+							chan->addUser(client);
+							client->addChannel(chan);
 						}
-						chan->addUser(client);
-						client->addChannel(chan);
+						else
+						{
+							// Unknown command
+						}
 					}
-
-					if (client->is_chan_member())
+					else if (!ft_strncmp(buf, "NICK ", 5))
 					{
-
-						if (parse_cmd(buf) == "PRV_MSG")
-						{}
-
-						else if ()
-						{}
-
-
-						else if ()
-						{}
-
+						std::string nick = nick_cmd(buf);
+						if (!nick.empty())
+							client->setNickName(nick);
+						else
+						{
+							// Unknown command
+						}
 					}
 				}
 			}

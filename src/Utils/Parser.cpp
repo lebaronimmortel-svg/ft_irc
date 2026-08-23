@@ -10,7 +10,7 @@ static int ft_strlen(const char *str)
     return (i);
 }
 
-static int ft_strncmp(const char *s1, const char *s2, int len)
+int ft_strncmp(const char *s1, const char *s2, int len)
 {
     if ((s1 && !s2) || (s2 && !s1))
         return (1);
@@ -72,6 +72,24 @@ std::string chan_join_cmd(char *buf)
         chan += buf[i];
     }
     return (chan);
+}
+
+std::string nick_cmd(char *buf)
+{
+    std::string nick;
+
+    if (ft_strncmp(buf, "NICK ", 5) || ft_strlen(buf) < 8)
+        return ("");
+    int len = ft_strlen(buf);
+    if (buf[len - 2] != '\r' || buf[len - 1] != '\n')
+        return (0);
+    for (int i = 5; i < len - 2; i++)
+    {
+        if (!is_valid_char(buf[i])) // même conditions que channel ?
+            return ("");
+        nick += buf[i];
+    }
+    return (nick);
 }
 
 /*
