@@ -36,15 +36,13 @@ class Server
         int _epollfd;
         sockaddr_in _servaddr;
 
-
     public :
 
         Server(int port, std::string pass);
         ~Server();
 
         // getters
-        inline const Channel &getChannel() const;
-        inline const Channel &getChannel(std::string str) const;
+        inline std::map<std::string, Channel *> &getChannelList();
         inline const std::string getPassword() const;
         inline const int getEpollFd() const;
         inline const int getSocket() const;
@@ -55,9 +53,25 @@ class Server
         Client	*find_client(int fd);
 
         void	addClient(int client_fd, std::string nick, std::string user, std::string full);
-        void	addChannel(Channel *channel, std::string name);
+        void	addChannel(Channel *channel);
         Client	*get_client(std::string username, int fd, int mode);
-        Channel	*get_channel(std::string name);
         cmdfunc	getcmd(std::string str);
         int		callcmd(std::string str, Client &);
+
+        std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
+        Channel *getChannelparse(std::string &str, int &i);
+        std::vector<Channel *> *getChannelListparse(std::string &str, int &i, int *fail);
+
+
+        //command
+        void invite(std::string &str, int &i, Client &);
+        void kick(std::string &str, int &i, Client &);
+        void topic(std::string &str, int &i, Client &);
+        void mode(std::string &str, int &i, Client &);
+        void pass(std::string &str, int &i, Client &);
+        void nick(std::string &str, int &i, Client &);
+        void name(std::string &str, int &i, Client &);
+        void join(std::string &str, int &i, Client &);
+        void privmsg(std::string &str, int &i, Client &);
+        void unknowncmd(std::string &str, int &i, Client &);
 };

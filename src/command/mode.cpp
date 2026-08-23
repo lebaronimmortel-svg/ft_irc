@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/23 18:22:03 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 01:19:31 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ mode_s *get_arg(std::string str){
 		}
 	}
 	if (!init_state){
-		std::cerr << "Mode: no argument provided";
+		std::cerr << "Mode: no argument provided" << std::flush;
 		return ;
 	}
 	int start = i;
@@ -135,39 +135,45 @@ mode_s *get_arg(std::string str){
 	return (args);
 }
 
-void mode(std::string &str, Client &c, Channel &chan){
-	if (chan.getModerator(c.getNickName()) != NULL){
+void Server::mode(std::string &str, int &i, Client &c){
+	int cpy = i;
+	Channel *chan = this->getChannelparse(str, i);
+	if (chan == NULL){
+		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		return ;
+	}
+	if (chan->getModerator(c.getNickName()) != NULL){
 		mode_s *args = get_arg(str);
 		if (args->flag.i == 1){
-			chan.setInviteOnlyStatus(true);
+			chan->setInviteOnlyStatus(true);
 		}
 		else if (args->flag.i == 0)
-			chan.setInviteOnlyStatus(false);
+			chan->setInviteOnlyStatus(false);
 		if (args->flag.t == 1){
-			chan.setTopicRestrictionStatus(true);
+			chan->setTopicRestrictionStatus(true);
 		}
 		if (args->flag.t == 0){
-			chan.setTopicRestrictionStatus(false);
+			chan->setTopicRestrictionStatus(false);
 		}
 		if (args->flag.k == 1){
-			chan.setPasswordRequirement(true);
-			chan.setPassword(args->value.k);
+			chan->setPasswordRequirement(true);
+			chan->setPassword(args->value.k);
 		}
 		else if (args->flag.k == 0){
-			chan.setPasswordRequirement(false);
+			chan->setPasswordRequirement(false);
 		}
 
 		if (args->flag.l = 1){
-			chan.setUserLimit(args->value.l);
+			chan->setUserLimit(args->value.l);
 		}
 		else if  (args->flag.l == 0)
-			chan.setUserLimit(0);
+			chan->setUserLimit(0);
 		if (args->flag.o == 1){
 
 			for (int i = 0; i < args->value.o.size(); i++){
-				Client *client = chan.getMember(args->value.o.at(i));
+				Client *client = chan->getMember(args->value.o.at(i));
 				if (client != NULL)
-					chan.addModerator(client);
+					chan->addModerator(client);
 				else
 				{
 					// error
@@ -176,9 +182,9 @@ void mode(std::string &str, Client &c, Channel &chan){
 		}
 		else if (args->flag.o == 0){
 			for (int i = 0; i < args->value.o.size(); i++){
-				Client *client = chan.getMember(args->value.o.at(i));
+				Client *client = chan->getMember(args->value.o.at(i));
 				if (client != NULL)
-					chan.delModerator(client);
+					chan->delModerator(client);
 				else
 				{
 					// error

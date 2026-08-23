@@ -6,11 +6,12 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/23 00:26:04 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 01:07:51 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Server.hpp"
+#include <cstring>
 
 Server::Server(int port, std::string pass): _password(pass){
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -69,24 +70,25 @@ void Server::addClient(int client_fd, std::string nick, std::string user, std::s
 	_clients.insert(std::make_pair(user ,client));
 }
 
-Channel* Server::get_channel(std::string name)
+inline std::map<std::string, Channel *> &Server::getChannelList()
 {
-	std::map<std::string, Channel*>::iterator i = _channels.find(name);
-
-	if (i == _channels.end())
-		return (NULL);
-	return (i->second);
+	return this->_channels;
 }
 
-void Server::addChannel(Channel *chan, std::string name)
+void Server::addChannel(Channel *chan)
 {
-	_channels.insert(std::make_pair(name, chan));
+	this->_channels[chan->getName()] = chan;
 }
 
 cmdfunc Server::getcmd(std::string str){
-	int slash = str.find('/');
-	if (!slash)
-		return NULL;
+	size_t lenght = str.length();
+	if (lenght == 0)
+		return (NULL);
+	int i = 0;
+	for (; i < lenght && isblank(str[i]); i++);
+	if (i == lenght)
+		return (NULL);
+	int slash = i;
 	int sep = str.find(slash, ' ');
 	if (sep == str.npos)
 		sep = str.length();
@@ -102,22 +104,62 @@ int Server::callcmd(std::string str, Client &c){
 	cmdfunc func = this->getcmd(str);
 	if (!func)
 	{
-		// return error
+		std::cerr << "Server: couldn't find command:" + str + "\n" << std::flush << std::flush;
 	}
 	int i = str.find(' ');
-	if (str[i + 1] != '#')
-	{
-		// return error
+	if (i == str.npos);
+		i = str.length();
+	func(str, i, c);
+}
+
+std::vector<std::string> &Server::getArgsparse(std::string &str, char sep, int &i){
+	std::vector<std::string> vec;
+	int sep = str.find(sep);
+	if (sep == str.npos)
+		return (vec);
+	size_t lenght = str.length();
+	for (; i < lenght; i++){
+		vec.push_back(str.substr(i, sep));
+		i += sep;
+		for (;strchr("\0\r\n :", str[i]) == NULL; i++)
+		sep = str.find(sep, i);
 	}
-	int end = str.find(' ', i + 1);
+	return (vec);
+}
+
+Channel *Server::getChannelparse(std::string &str, int &i){
+	size_t len_str = str.length();
+	if (i == len_str){
+		return (NULL);
+	}
+	if (!str[i + 1] != '#')
+		return (NULL);
+	size_t end = str.find(' ');
 	if (end == str.npos)
-		end = str.length() - i;
-	std::string name = str.substr(i, end);
-	const Channel &chan = this->getChannel(name);
-	if (!&chan)
-	{
-		// return error
+		end == len_str;
+	std::string sub(str.substr(i, end));
+	std::map<std::string, Channel *> lst = this->getChannelList();
+	i = end;
+	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
+}
+std::vector<Channel *> *Server::getChannelListparse(std::string &str, int &i, int *fail){
+	std::vector<std::string> &args = this->getArgsparse(str, ',', i);
+	int lenght = args.size();
+	std::vector<Channel *> *chanvec = new std::vector<Channel *>();
+	for (int y = 0; y < lenght; y++){
+		if (args[y][0] != '#'){
+			*fail = y;
+			return (NULL);	
+		}
+		else{
+			std::map<std::string, Channel *>::iterator find = this->_channels.find(args[y]);
+			if (find != this->_channels.end())
+				chanvec->push_back((*find).second);
+			else {
+				*fail = y;
+				return (NULL);
+			}
+		}
 	}
-	std::string sub = &str[end];
-	func(sub, c, const_cast<Channel &>(chan));
+	return (chanvec);
 }

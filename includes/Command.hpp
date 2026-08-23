@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:35:33 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/23 19:55:14 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 01:21:49 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,7 @@
 #include <vector>
 #include <iostream>
 
-typedef void (* cmdfunc)(std::string &str, Client &, Channel &);
-
-void invite(std::string &str, Client &, Channel &);
-void kick(std::string &str, Client &, Channel &);
-void topic(std::string &str, Client &, Channel &);
-void mode(std::string &str, Client &, Channel &);
-void pass(std::string &str, Client &, Channel &);
-void nick(std::string &str, Client &, Channel &);
-void name(std::string &str, Client &, Channel &);
-void join(std::string &str, Client &, Channel &);
-void privmsg(std::string &str, Client &, Channel &);
-void unknowncmd(std::string &str, Client &, Channel &);
-
-std::vector<std::string> &getArgs(std::string &str);
+typedef void (Server::*cmdfunc)(std::string &str, int &i,Client &);
 
 enum cmdlistenum {
     INVITE,
@@ -49,39 +36,39 @@ struct cmdlist {
 cmdlist cmdLU[] = {
     [INVITE] = {
         .name = "invite",
-        .call = invite,
+        .call = Server::invite,
     },
     [KICK] = {
         .name = "kick",
-        .call = kick,
+        .call =  Server::kick,
     },
     [TOPIC] = {
         .name = "topic",
-        .call = topic,
+        .call =  Server::topic,
     },
     [MODE] = {
         .name = "mode",
-        .call = mode,
+        .call =  Server::mode,
     },
     [PASS] = {
         .name = "pass",
-        .call = pass,
+        .call =  Server::pass,
     },
     [NICK] = {
         .name = "nick",
-        .call = nick,
+        .call =  Server::nick,
     },
     [NAME] = {
         .name = "name",
-        .call = name,
+        .call =  Server::name,
     },
     [JOIN] = {
         .name = "join",
-        .call = join,
+        .call =  Server::join,
     },
     [PRIVMSG] = {
         .name = "privmsg",
-        .call = privmsg,
+        .call =  Server::privmsg,
     },
 };
 

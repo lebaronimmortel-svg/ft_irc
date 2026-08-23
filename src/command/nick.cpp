@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/23 19:54:45 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 01:19:37 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,21 @@ bool nicknameValid(std::string &str){
 	return (true);
 }
 
-void nick(std::string &str, Client &c, Channel &chan){
-	std::vector<std::string> args = getArgs(str);
+void Server::nick(std::string &str, int &i, Client &c){
+	int cpy = i;
+	Channel *chan = this->getChannelparse(str, i);
+	if (chan == NULL){
+		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		return ;
+	}
+	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
 	if (args.size() != 1){
-		std::cerr << "Pass: require only one argument\n";
+		std::cerr << "Pass: require only one argument\n" << std::flush;
 		return ;
 	}
 	
 	if (!nicknameValid(args.at(0))){
-		std::cerr << "Pass: incorrect nickname provided\n";
+		std::cerr << "Pass: incorrect nickname provided\n" << std::flush;
 		return ;
 	};
 	c.setNickName(args.at(0));

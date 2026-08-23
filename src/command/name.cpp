@@ -6,17 +6,23 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:51:25 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/23 19:54:12 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 01:19:34 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-void name(std::string &str, Client &c, Channel &chan){
-	std::vector<std::string> args = getArgs(str);
+void Server::name(std::string &str, int &i, Client &c){
+	int cpy = i;
+	Channel *chan = this->getChannelparse(str, i);
+	if (chan == NULL){
+		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		return ;
+	}
+	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
 	if (args.size() != 1){
-		std::cerr << "Pass: require only one argument\n";
+		std::cerr << "Pass: require only one argument\n" << std::flush;
 		return ;
 	}
 	c.setUserName(args.at(0));
