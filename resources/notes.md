@@ -140,7 +140,7 @@
 	
 	bind() associe un socket brut (créé par socket()) à une adresse IP et un port précis de votre machine local.
 
-	listen() transforme le socket passif en un socket prêt à recevoir des demandes de connexion. Elle crée une file d'attente pour stocker les clients qui essaient de se connecter.
+	listen() transforme le socket en un socket d'écoute prêt à recevoir des demandes de connexion. Elle crée une file d'attente pour stocker les clients qui essaient de se connecter.
 
 	accept() extrait la première demande de connexion dans la file d'attente de listen(). C'est une fonction bloquante (par défaut) : elle met le programme en pause jusqu'à ce qu'un client se connecte. accept() crée un tout nouveau socket dédié à la communication avec ce client précis. Le socket initial (server_fd) reste en écoute pour continuer d'accueillir d'autres clients.
 

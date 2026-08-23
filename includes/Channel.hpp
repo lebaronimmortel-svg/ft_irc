@@ -35,6 +35,7 @@ class Channel
         // constructor/destructor
         Channel();
         ~Channel();
+        Channel(std::string name);
 
         // getters
         std::string  getName();
@@ -61,6 +62,8 @@ class Channel
         void         setTopicLastModifierUsername(std::string username);
         void         setUserLimit(unsigned int limit);
 
+        std::string belongs_to_channel(int fd);
+        void        addUser(Client *client);
         void        addModerator(Client *);
         void        delModerator(Client *);
 };

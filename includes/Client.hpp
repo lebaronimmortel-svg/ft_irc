@@ -6,6 +6,8 @@ class Client
 {
     private :
     
+        std::map<std::string, Channel*> _channels;
+
     	// identifier in the server
         std::string _nickname;
         
@@ -27,6 +29,7 @@ class Client
         // constructor/destructor
         Client();
         ~Client();
+        Client(std::string nick, std::string user, std::string full, bool auth, int fd);
 
         // getters
         std::string getNickName();
@@ -40,7 +43,10 @@ class Client
         void        setNickName(std::string nickname);
         void        setFullName(std::string fullname);
         void        setUserName(std::string username);
-        void        setAuthenticated(bool authenticated);
+        void        setAuthenticated(bool authenticated); 
         void        setFd(int fd);
-        void        setBuffer(std::string buffer);    
+        void        setBuffer(std::string);
+
+        int     is_chan_member();
+        void    addChannel(Channel* channel);
 };
