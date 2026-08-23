@@ -2,10 +2,13 @@
 
 #include <map>
 #include <iostream>
+#include <utility>
 #include <stdlib.h>
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
 
-unsigned int parse_arg(char *arg);
-
+// Utils/Parser.cpp
+int parse_arg(char *arg);
+int chan_join_cmd(char *buf);
+std::string parse_auth(std::string str, int mode);

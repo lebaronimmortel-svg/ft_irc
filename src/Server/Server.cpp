@@ -49,3 +49,31 @@ Server::Server(int port, std::string pass): _password(pass){
 inline const int Server::getEpollFd() const {return this->_epollfd;};
 inline const int Server::getSocket() const {return this->_servsock;};
 inline const sockaddr_in Server::getAddress() const {return this->_servaddr;};
+
+Client* Server::has_client(std::string username, int fd, int mode)
+{
+	for (std::map<std::string, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	{
+		if (mode == 0 && i->first == username)
+			return (i->second);
+		if (mode == 1 && i->second->getFd() == fd)
+			return (i->second);
+	}
+
+	return (NULL);
+}
+
+void Server::addClient(int client_fd, std::string nick, std::string user, std::string full)
+{
+	Client *client = new Client();
+	client->setFd(client_fd);
+	client->setNickName(nick);
+	client->setUserName(user);
+	client->setFullName(full);
+	client->setAuthenticated(1);
+	client->setBuffer("");
+	_clients.insert(std::make_pair(user ,client));
+
+
+	
+}

@@ -40,7 +40,7 @@ class Client
         void        setNickName(std::string nickname);
         void        setFullName(std::string fullname);
         void        setUserName(std::string username);
-        void        setAuthenticated(bool authenticated);
+        void        setAuthenticated(bool authenticated); 
         void        setFd(int fd);
-        void        setBuffer(std::string buffer);    
+        void        setBuffer(std::string);
 };

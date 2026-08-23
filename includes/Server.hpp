@@ -26,6 +26,7 @@ class Server
 
         // channels
         std::map<std::string, Channel*> _channels;
+        std::map<std::string, Client*> _clients;
         
         // password for the channel
         std::string _password;
@@ -47,4 +48,9 @@ class Server
 
         // setters
         void    setPassword(std::string password);
+        Client *find_client(int fd);
+
+        std::string belongs_to_channel();
+        void addClient(int client_fd, std::string nick, std::string user, std::string full);
+        Client *has_client(std::string username, int fd, int mode);
 };

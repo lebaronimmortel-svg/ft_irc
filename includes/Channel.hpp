@@ -60,5 +60,7 @@ class Channel
         void         setTopicLastModifDate(std::string date);
         void         setTopicLastModifierUsername(std::string username);
         void         setUserLimit(unsigned int limit);
+
+        std::string belongs_to_channel(int fd);
 };
 
