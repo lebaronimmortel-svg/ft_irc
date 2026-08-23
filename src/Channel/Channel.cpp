@@ -4,6 +4,8 @@ Channel::Channel() {}
 
 Channel::~Channel() {}
 
+Channel::Channel(std::string name) : _name(name) {}
+
 std::string Channel::getName()
 {
     return _name;
@@ -117,4 +119,9 @@ std::string Channel::belongs_to_channel(int fd)
             return i->second->getUserName();
     }
     return ("");
+}
+
+void Channel::addUser(Client *client)
+{
+    _members.insert(std::make_pair(client->getUserName(), client));
 }

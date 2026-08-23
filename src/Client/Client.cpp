@@ -4,6 +4,9 @@ Client::Client() {}
 
 Client::~Client() {}
 
+Client::Client(std::string nick, std::string user, std::string full, bool auth, int fd) : 
+_nickname(nick), _username(user), _fullname(full), _authenticated(auth), _fd(fd) {}
+
 std::string Client::getNickName()
 {
     return _nickname;
@@ -62,4 +65,16 @@ void Client::setFd(int fd)
 void Client::setBuffer(std::string buffer)
 {
     _buffer = buffer;
+}
+
+int Client::is_chan_member()
+{
+    if (_channels.empty())
+        return (0);
+    return (1);
+}
+
+void Client::addChannel(Channel* chan)
+{
+    _channels.insert(std::make_pair(chan->getName(), chan));
 }

@@ -51,20 +51,27 @@ static int is_valid_char(char c)
     return (1);
 }
 
-// checker longueur msg ?
-int chan_join_cmd(char *buf)
+/*
+
+JOIN #*********\r\n
+
+*/
+std::string chan_join_cmd(char *buf)
 {
+    std::string chan;
+
     if (ft_strncmp(buf, "JOIN #", 6) || ft_strlen(buf) < 9)
-        return (0);
+        return ("");
     int len = ft_strlen(buf);
     if (buf[len - 2] != '\r' || buf[len - 1] != '\n')
         return (0);
     for (int i = 6; i < len - 2; i++)
     {
         if (!is_valid_char(buf[i]))
-            return (0);
+            return ("");
+        chan += buf[i];
     }
-    return (1);
+    return (chan);
 }
 
 /*
@@ -139,3 +146,6 @@ std::string parse_auth(std::string str, int mode)
     if (mode == 2)
         return (full);
 }
+
+std::string parse_cmd(char *buf)
+{}

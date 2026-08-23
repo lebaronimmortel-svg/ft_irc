@@ -10,5 +10,6 @@
 
 // Utils/Parser.cpp
 int parse_arg(char *arg);
-int chan_join_cmd(char *buf);
+std::string chan_join_cmd(char *buf);
 std::string parse_auth(std::string str, int mode);
+std::string parse_cmd(char *buf);
