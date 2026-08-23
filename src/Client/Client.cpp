@@ -5,7 +5,7 @@ Client::Client() {}
 Client::~Client() {}
 
 Client::Client(std::string nick, std::string user, std::string full, bool auth, int fd) : 
-_nickname(nick), _username(user), _fullname(full), _authenticated(auth), _fd(fd) {}
+_nickname(nick), _username(user), _fullname(full), _authenticated(auth), _fd(fd), authLevel(0){}
 
 std::string Client::getNickName()
 {
@@ -26,6 +26,8 @@ bool Client::getAuthenticated()
 {
     return _authenticated;
 }
+
+size_t &Client::getAuthLevel(){ return this->authLevel;}
 
 int Client::getFd()
 {

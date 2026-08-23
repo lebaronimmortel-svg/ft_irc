@@ -18,17 +18,36 @@ std::string Channel::getPassword()
 
 Client* Channel::getMember(std::string username)
 {
-    return _members.at(username);
+     try {
+        Client *user = _members.at(username);
+        return (user);
+    }
+    catch (std::exception &e){
+        return (NULL);
+    }
 }
 
 Client* Channel::getModerator(std::string username)
 {
-    return _moderators.at(username);
+    try {
+        Client *user = _moderators.at(username);
+        return (user);
+    }
+    catch (std::exception &e){
+        return (NULL);
+    }
 }
 
 Client* Channel::getInvited(std::string username)
 {
-    return _invited.at(username);
+    try {
+        Client *user = _invited.at(username);
+        return (user);
+    }
+    catch (std::exception &e){
+        return (NULL);
+    }
+    
 }
 
 bool Channel::getPasswordRequirement()
@@ -133,6 +152,19 @@ void Channel::delModerator(Client *c){
     try {
         this->_moderators.at(c->getNickName());
         this->_moderators.erase(c->getNickName());
+    } catch (std::exception &e){
+        return ;
+    }
+}
+
+void Channel::addinvited(Client  *c){
+    this->_invited[c->getNickName()] = c;
+}
+
+void Channel::delMember(Client *c){
+    try {
+        this->_members.at(c->getNickName());
+        this->_members.erase(c->getNickName());
     } catch (std::exception &e){
         return ;
     }

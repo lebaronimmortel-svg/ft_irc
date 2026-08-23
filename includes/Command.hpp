@@ -6,24 +6,28 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:35:33 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/22 23:32:59 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/23 19:55:14 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+#include <vector>
+#include <iostream>
 
-typedef int (* cmdfunc)(std::string &str, Client &, Channel &);
+typedef void (* cmdfunc)(std::string &str, Client &, Channel &);
 
-int invite(std::string &str, Client &, Channel &);
-int kick(std::string &str, Client &, Channel &);
-int topic(std::string &str, Client &, Channel &);
-int mode(std::string &str, Client &, Channel &);
-int pass(std::string &str, Client &, Channel &);
-int nick(std::string &str, Client &, Channel &);
-int name(std::string &str, Client &, Channel &);
-int join(std::string &str, Client &, Channel &);
-int privmsg(std::string &str, Client &, Channel &);
-int unknowncmd(std::string &str, Client &, Channel &);
+void invite(std::string &str, Client &, Channel &);
+void kick(std::string &str, Client &, Channel &);
+void topic(std::string &str, Client &, Channel &);
+void mode(std::string &str, Client &, Channel &);
+void pass(std::string &str, Client &, Channel &);
+void nick(std::string &str, Client &, Channel &);
+void name(std::string &str, Client &, Channel &);
+void join(std::string &str, Client &, Channel &);
+void privmsg(std::string &str, Client &, Channel &);
+void unknowncmd(std::string &str, Client &, Channel &);
+
+std::vector<std::string> &getArgs(std::string &str);
 
 enum cmdlistenum {
     INVITE,
@@ -33,8 +37,8 @@ enum cmdlistenum {
     PASS,
     NICK,
     NAME,
-    JOIN,
-    PRIVMSG,
+    JOIN,// to do
+    PRIVMSG,// to do
 };
 
 struct cmdlist {

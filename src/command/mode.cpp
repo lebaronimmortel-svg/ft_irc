@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/22 23:26:20 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/23 18:22:03 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,6 @@ std::string get_word(std::string str, int &i, bool &end){
 	}
 	end = true;
 	return (str.substr(start, i));
-}
-
-bool have_right(Client &c, Channel &chan){
-	if (c.getAuthenticated()){
-		return chan.getModerator(c.getNickName());
-	}
-	return (false);
 }
 
 mode_s *get_arg(std::string str){
@@ -101,6 +94,10 @@ mode_s *get_arg(std::string str){
 			}
 		}
 	}
+	if (!init_state){
+		std::cerr << "Mode: no argument provided";
+		return ;
+	}
 	int start = i;
 	std::vector<std::string> wvec;
 	size_t lenght_vec = 0;
@@ -138,14 +135,19 @@ mode_s *get_arg(std::string str){
 	return (args);
 }
 
-int mode(std::string str, Client &c, Channel &chan){
-	if (have_right(c, chan)){
+void mode(std::string &str, Client &c, Channel &chan){
+	if (chan.getModerator(c.getNickName()) != NULL){
 		mode_s *args = get_arg(str);
 		if (args->flag.i == 1){
 			chan.setInviteOnlyStatus(true);
 		}
+		else if (args->flag.i == 0)
+			chan.setInviteOnlyStatus(false);
 		if (args->flag.t == 1){
 			chan.setTopicRestrictionStatus(true);
+		}
+		if (args->flag.t == 0){
+			chan.setTopicRestrictionStatus(false);
 		}
 		if (args->flag.k == 1){
 			chan.setPasswordRequirement(true);

@@ -2,6 +2,13 @@
 
 #include "Header.hpp"
 
+enum authentification{
+    PASSWORD,
+    USERNAME,
+    NICKNAME,
+};
+
+
 class Client
 {
     private :
@@ -24,6 +31,8 @@ class Client
         // stores current command
         std::string _buffer;
 
+        size_t   authLevel;
+
     public :
 
         // constructor/destructor
@@ -38,6 +47,7 @@ class Client
         bool        getAuthenticated();
         int         getFd();
         std::string getBuffer();
+        size_t       &getAuthLevel();
 
         // setters
         void        setNickName(std::string nickname);
