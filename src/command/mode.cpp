@@ -65,9 +65,15 @@ mode_s *get_arg(std::string str){
 	int i = 0;
 	for (; i < lenght; i++){
 		if (str[i] == '+')
+		{
 			state = 1;
+			init_state = true;
+		}
 		else if (str[i] == '-')
+		{
 			state = 0;
+			init_state = true;
+		}
 		else if (str[i] == ' ')
 			break;
 		else if (!init_state || strchr("itkol", str[i]) == NULL)
@@ -106,7 +112,7 @@ mode_s *get_arg(std::string str){
 		wvec.push_back(word);
 		lenght_vec++;
 	};
-	if (lenght_vec)
+	if (lenght_vec == 0)
 		return (args);
 	size_t order_l = order.length();
 	size_t vec_i = 0;
@@ -145,7 +151,13 @@ int mode(std::string str, Client &c, Channel &chan){
 			chan.setPasswordRequirement(true);
 			chan.setPassword(args->value.k);
 		}
+		else if (args->flag.k == 0){
+			chan.setPasswordRequirement(false);
+		}
 
+		if (args->flag.l = 1){
+			chan.setUserLimit(args->value.l);
+		}
 		else if  (args->flag.l == 0)
 			chan.setUserLimit(0);
 		if (args->flag.o == 1){
@@ -154,6 +166,10 @@ int mode(std::string str, Client &c, Channel &chan){
 				Client *client = chan.getMember(args->value.o.at(i));
 				if (client != NULL)
 					chan.addModerator(client);
+				else
+				{
+					// error
+				}
 			}
 		}
 		else if (args->flag.o == 0){
@@ -161,13 +177,11 @@ int mode(std::string str, Client &c, Channel &chan){
 				Client *client = chan.getMember(args->value.o.at(i));
 				if (client != NULL)
 					chan.delModerator(client);
+				else
+				{
+					// error
+				}
 			}
-		}
-		else if (args->flag.k == 0){
-			chan.setPasswordRequirement(false);
-		}
-		if (args->flag.l = 1){
-			chan.setUserLimit(args->value.l);
 		}
 	}
 }
