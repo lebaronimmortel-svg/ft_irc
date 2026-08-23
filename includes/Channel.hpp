@@ -64,5 +64,7 @@ class Channel
 
         std::string belongs_to_channel(int fd);
         void        addUser(Client *client);
+        void        addModerator(Client *);
+        void        delModerator(Client *);
 };
 

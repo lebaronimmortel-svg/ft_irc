@@ -124,4 +124,16 @@ std::string Channel::belongs_to_channel(int fd)
 void Channel::addUser(Client *client)
 {
     _members.insert(std::make_pair(client->getUserName(), client));
+} 
+void Channel::addModerator(Client *c){
+    this->_moderators[c->getNickName()] = c; 
+}
+
+void Channel::delModerator(Client *c){
+    try {
+        this->_moderators.at(c->getNickName());
+        this->_moderators.erase(c->getNickName());
+    } catch (std::exception &e){
+        return ;
+    }
 }
