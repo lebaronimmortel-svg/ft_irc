@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:20:05 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 22:21:23 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,23 @@
 #include "../../includes/Client.hpp"
 
 void Server::pass(std::string &str, int &i, Client &c){
+	if (c.getAuthenticated()){
+		this->reply(&c, ERR_ALREADYREGISTRED, "is already register");
+		return ;
+	}
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
-		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
-		return ;
-	}
-	if (c.getAuthenticated()){
-		std::cerr << "PASS: user [" + c.getNickName() + "] is already register\n" << std::flush;
+		this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
 		return ;
 	}
 	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
-	if (args.size() != 1){
-		std::cerr << "Pass: require only one argument\n" << std::flush;
+	if (args.size() == 0){
+		this->reply(&c, ERR_NEEDMOREPARAMS, "require a parameter");
 		return ;
 	}
 	if (args.at(0) != chan->getPassword()){
-		std::cerr << "Pass: incorrect password provided\n" << std::flush;
+		this->reply(&c, ERR_PASSWDMISMATCH, "incorect password");
 		return ;
 	};
 	c.getAuthLevel() |= (1 << PASSWORD);

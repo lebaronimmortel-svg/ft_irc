@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:19:37 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 23:17:28 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,23 @@ void Server::nick(std::string &str, int &i, Client &c){
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
-		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
 		return ;
 	}
 	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
-	if (args.size() != 1){
-		std::cerr << "Pass: require only one argument\n" << std::flush;
+	if (args.size() == 0){
+		this->reply(&c, ERR_NONICKNAMEGIVEN, "require a nickname");
 		return ;
 	}
 	
 	if (!nicknameValid(args.at(0))){
-		std::cerr << "Pass: incorrect nickname provided\n" << std::flush;
+		this->reply(&c, ERR_ERRONEUSNICKNAME, "erroneous nickname");
 		return ;
 	};
+	if (this->get_client(args.at(0), 0, 0) != NULL){
+		this->reply(&c, ERR_NICKNAMEINUSE, "nickname already in use");
+		return ;
+	}
 	c.setNickName(args.at(0));
 	if (c.getAuthenticated())
 		return ;

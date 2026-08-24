@@ -6,12 +6,13 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:07:51 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 22:18:47 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Server.hpp"
 #include <cstring>
+
 
 Server::Server(int port, std::string pass): _password(pass){
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -104,12 +105,14 @@ int Server::callcmd(std::string str, Client &c){
 	cmdfunc func = this->getcmd(str);
 	if (!func)
 	{
-		std::cerr << "Server: couldn't find command:" + str + "\n" << std::flush << std::flush;
+		this->reply(&c, ERR_UNKNOWNCOMMAND, "unknown command");
+		return 0;
 	}
 	int i = str.find(' ');
 	if (i == str.npos);
 		i = str.length();
 	func(str, i, c);
+	return 1;
 }
 
 std::vector<std::string> &Server::getArgsparse(std::string &str, char sep, int &i){
@@ -121,7 +124,7 @@ std::vector<std::string> &Server::getArgsparse(std::string &str, char sep, int &
 	for (; i < lenght; i++){
 		vec.push_back(str.substr(i, sep));
 		i += sep;
-		for (;strchr("\0\r\n :", str[i]) == NULL; i++)
+		for (;i < lenght && strchr("\0\r\n :", str[i]) == NULL; i++)
 		sep = str.find(sep, i);
 	}
 	return (vec);
@@ -142,24 +145,29 @@ Channel *Server::getChannelparse(std::string &str, int &i){
 	i = end;
 	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
 }
-std::vector<Channel *> *Server::getChannelListparse(std::string &str, int &i, int *fail){
+std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, int &i){
 	std::vector<std::string> &args = this->getArgsparse(str, ',', i);
 	int lenght = args.size();
 	std::vector<Channel *> *chanvec = new std::vector<Channel *>();
 	for (int y = 0; y < lenght; y++){
 		if (args[y][0] != '#'){
-			*fail = y;
-			return (NULL);	
+			this->reply(c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
 		}
 		else{
 			std::map<std::string, Channel *>::iterator find = this->_channels.find(args[y]);
 			if (find != this->_channels.end())
 				chanvec->push_back((*find).second);
 			else {
-				*fail = y;
-				return (NULL);
+				this->reply(c, ERR_NOSUCHCHANNEL, "this doen't exist");
 			}
 		}
 	}
 	return (chanvec);
+}
+
+void Server::reply(Client *c, reply_flag flag, std::string msg){
+	std::string name = (c->getNickName().empty()) ? "*" : c->getNickName();
+	std::string message = ":ircserv " + replay_flag_value[flag] + " " + name
+	 + " " + msg + "\r\n";
+	send (c->getFd(), message.c_str(), message.size(), 0);
 }

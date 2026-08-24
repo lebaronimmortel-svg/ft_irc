@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:00:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:19:28 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 22:20:08 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,19 @@
 
 
 void Server::kick(std::string &str, int &i, Client &c){
+	if (!c.getAuthenticated())
+	{
+		this->reply(&c, ERR_NOTREGISTERED, "require registration");
+		return;
+	}
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
-		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
 		return ;
 	}
 	if (chan->getModerator(c.getNickName()) == NULL){
-		std::cerr << "KICK: user [" + c.getNickName() + "] is not an operator\n" << std::flush;
+		this->reply(&c, ERR_CHANOPRIVSNEEDED, "require to be operator");
 		return ;
 	}
 	std::vector<std::string> arg = this->getArgsparse(str, ' ', i);
@@ -32,7 +37,7 @@ void Server::kick(std::string &str, int &i, Client &c){
 	for (int i = 0; i < lenght; i++){
 		Client *user = chan->getMember(arg.at(i));
 		if (user == NULL){
-			std::cerr << "KICK: user [" + arg.at(i) + "] is not recognized\n" << std::flush;
+			this->reply(&c, ERR_NOSUCHNICK, "no such nickname");
 		}
 		else {
 			chan->delMember(user);

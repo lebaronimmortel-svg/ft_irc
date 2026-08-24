@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:19:31 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 22:12:15 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ std::string get_word(std::string str, int &i, bool &end){
 	return (str.substr(start, i));
 }
 
-mode_s *get_arg(std::string str){
+mode_s *Server::getflagmode(Client *c, std::string str){
 	mode_s *args = new mode_s();
 	args->flag.i = -1;
 	args->flag.t = -1;
@@ -70,7 +70,10 @@ mode_s *get_arg(std::string str){
 		else if (str[i] == ' ')
 			break;
 		else if (!init_state || strchr("itkol", str[i]) == NULL)
-			return NULL;
+		{
+			this->reply(c, ERR_UMODEUNKNOWNFLAG, "unknown mode flag: " + str[i]);
+			continue;
+		}
 		else {
 			switch (str[i]){
 				case 'i':{
@@ -95,8 +98,8 @@ mode_s *get_arg(std::string str){
 		}
 	}
 	if (!init_state){
-		std::cerr << "Mode: no argument provided" << std::flush;
-		return ;
+		this->reply(c, ERR_NEEDMOREPARAMS, "need more parameter");
+		return (NULL);
 	}
 	int start = i;
 	std::vector<std::string> wvec;
@@ -127,7 +130,7 @@ mode_s *get_arg(std::string str){
 				std::istringstream is(wvec.at(vec_i));
 				is >> args->value.l;
 				if (is.fail() || !is.eof()){
-					// return error
+					this->reply(c, ERR_UNKNOWNMODE, "error conversion");
 				}
 			}
 		}
@@ -136,59 +139,68 @@ mode_s *get_arg(std::string str){
 }
 
 void Server::mode(std::string &str, int &i, Client &c){
+	if (!c.getAuthenticated())
+	{
+		this->reply(&c, ERR_NOTREGISTERED, "require to be registered");
+		return;
+	}
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
-		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+		this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
 		return ;
 	}
-	if (chan->getModerator(c.getNickName()) != NULL){
-		mode_s *args = get_arg(str);
-		if (args->flag.i == 1){
-			chan->setInviteOnlyStatus(true);
-		}
-		else if (args->flag.i == 0)
-			chan->setInviteOnlyStatus(false);
-		if (args->flag.t == 1){
-			chan->setTopicRestrictionStatus(true);
-		}
-		if (args->flag.t == 0){
-			chan->setTopicRestrictionStatus(false);
-		}
-		if (args->flag.k == 1){
-			chan->setPasswordRequirement(true);
-			chan->setPassword(args->value.k);
-		}
-		else if (args->flag.k == 0){
-			chan->setPasswordRequirement(false);
-		}
-
-		if (args->flag.l = 1){
-			chan->setUserLimit(args->value.l);
-		}
-		else if  (args->flag.l == 0)
-			chan->setUserLimit(0);
-		if (args->flag.o == 1){
-
-			for (int i = 0; i < args->value.o.size(); i++){
-				Client *client = chan->getMember(args->value.o.at(i));
-				if (client != NULL)
-					chan->addModerator(client);
-				else
-				{
-					// error
-				}
+	if (!chan->getModerator(c.getNickName()) != NULL){
+		this->reply(&c, ERR_CHANOPRIVSNEEDED, "not an operator");
+		return ;
+	}
+	mode_s *args = this->getflagmode(&c, str);
+	if (args->flag.i == 1){
+		chan->setInviteOnlyStatus(true);
+	}
+	else if (args->flag.i == 0)
+		chan->setInviteOnlyStatus(false);
+	if (args->flag.t == 1){
+		chan->setTopicRestrictionStatus(true);
+	}
+	if (args->flag.t == 0){
+		chan->setTopicRestrictionStatus(false);
+	}
+	if (args->flag.k == 1){
+		chan->setPasswordRequirement(true);
+		chan->setPassword(args->value.k);
+	}
+	else if (args->flag.k == 0){
+		chan->setPasswordRequirement(false);
+	}
+	if (args->flag.l = 1){
+		chan->setUserLimit(args->value.l);
+	}
+	else if  (args->flag.l == 0)
+		chan->setUserLimit(0);
+	if (args->flag.o == 1){
+		for (int i = 0; i < args->value.o.size(); i++){
+			Client *client = chan->getMember(args->value.o.at(i));
+			if (client != NULL)
+				chan->addModerator(client);
+			else
+			{
+				this->reply(&c, ERR_NOSUCHNICK, "no such nickname");
 			}
 		}
-		else if (args->flag.o == 0){
-			for (int i = 0; i < args->value.o.size(); i++){
-				Client *client = chan->getMember(args->value.o.at(i));
-				if (client != NULL)
+	}
+	else if (args->flag.o == 0){
+		for (int i = 0; i < args->value.o.size(); i++){
+			Client *client = chan->getMember(args->value.o.at(i));
+			if (client != NULL)
+			{
+				chan->delMember(client);
+				if (chan->getModerator(args->value.o.at(i)) != NULL)
 					chan->delModerator(client);
-				else
-				{
-					// error
-				}
+			}
+			else
+			{
+				this->reply(&c, ERR_NOSUCHNICK, "no such nickname");
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include "Reply.hpp"
 #include "Header.hpp"
 #include <sys/socket.h>
 #include <sys/epoll.h>
@@ -38,7 +40,8 @@ class Server
 
         std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
         Channel *getChannelparse(std::string &str, int &i);
-        std::vector<Channel *> *getChannelListparse(std::string &str, int &i, int *fail);
+        std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, int &i);
+        mode_s *getflagmode(Client *c, std::string str);
 
     public :
 
@@ -56,11 +59,15 @@ class Server
         void    setPassword(std::string password);
         Client	*find_client(int fd);
 
+        // utils
         void	addClient(int client_fd, std::string nick, std::string user, std::string full);
         void	addChannel(Channel *channel);
         Client	*get_client(std::string username, int fd, int mode);
         cmdfunc	getcmd(std::string str);
         int		callcmd(std::string str, Client &);
+
+        //reply
+        void reply(Client *c, reply_flag flag, std::string msg);
 
         //command
         void invite(std::string &str, int &i, Client &);
@@ -69,8 +76,7 @@ class Server
         void mode(std::string &str, int &i, Client &);
         void pass(std::string &str, int &i, Client &);
         void nick(std::string &str, int &i, Client &);
-        void name(std::string &str, int &i, Client &);
+        void user(std::string &str, int &i, Client &);
         void join(std::string &str, int &i, Client &);
         void privmsg(std::string &str, int &i, Client &);
-        void unknowncmd(std::string &str, int &i, Client &);
 };

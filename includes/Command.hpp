@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:35:33 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:21:49 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/24 21:47:50 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,39 +35,39 @@ struct cmdlist {
 
 cmdlist cmdLU[] = {
     [INVITE] = {
-        .name = "invite",
+        .name = "INVITE",
         .call = Server::invite,
     },
     [KICK] = {
-        .name = "kick",
+        .name = "KICK",
         .call =  Server::kick,
     },
     [TOPIC] = {
-        .name = "topic",
+        .name = "TOPIC",
         .call =  Server::topic,
     },
     [MODE] = {
-        .name = "mode",
+        .name = "MODE",
         .call =  Server::mode,
     },
     [PASS] = {
-        .name = "pass",
+        .name = "PASS",
         .call =  Server::pass,
     },
     [NICK] = {
-        .name = "nick",
+        .name = "NICK",
         .call =  Server::nick,
     },
     [NAME] = {
-        .name = "name",
-        .call =  Server::name,
+        .name = "USER",
+        .call =  Server::user,
     },
     [JOIN] = {
-        .name = "join",
+        .name = "JOIN",
         .call =  Server::join,
     },
     [PRIVMSG] = {
-        .name = "privmsg",
+        .name = "PRIVMSG",
         .call =  Server::privmsg,
     },
 };
