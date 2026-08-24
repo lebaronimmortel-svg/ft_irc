@@ -50,14 +50,17 @@ class Server
         inline const int getSocket() const;
         inline const sockaddr_in getAddress() const;
 
-        // setters
-        void    setPassword(std::string password);
-        Client *find_client(int fd);
-
-        void addClient(int client_fd, std::string nick, std::string user, std::string full);
-        void addChannel(Channel *channel, std::string name);
         Client *get_client(std::string username, int fd, int mode);
         Channel *get_channel(std::string name);
+
+        // setters
+        void    setPassword(std::string password);
+
+        Client *find_client(int fd);
+        void addClient(int client_fd, std::string nick, std::string user, std::string full);
+        void addChannel(Channel *channel, std::string name);
+
+        // titouan
         cmdfunc   getcmd(std::string str);
         int        callcmd(std::string str, Client &);
 };

@@ -137,3 +137,13 @@ void Channel::delModerator(Client *c){
         return ;
     }
 }
+
+void Channel::delUser(Client *c)
+{
+    try {
+        this->_members.at(c->getNickName());
+        this->_members.erase(c->getNickName());
+    } catch (std::exception &e){
+        return ;
+    }
+}

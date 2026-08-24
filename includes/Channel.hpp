@@ -66,5 +66,6 @@ class Channel
         void        addUser(Client *client);
         void        addModerator(Client *);
         void        delModerator(Client *);
+        void        delUser(Client *);
 };
 
