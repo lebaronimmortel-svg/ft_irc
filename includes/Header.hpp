@@ -3,6 +3,7 @@
 #include <map>
 #include <iostream>
 #include <utility>
+#include <ctime>
 #include <stdlib.h>
 #include "Channel.hpp"
 #include "Client.hpp"
@@ -21,3 +22,7 @@ std::string prv_chan_cmd(char *buf, int mode);
 std::string prv_clt_cmd(char *buf, int mode);
 int ft_strncmp(const char *s1, const char *s2, int len);
 std::string topic_cmd(char *buf, int mode);
+int ft_strlen(const char *str);
+
+// main.cpp
+void handle_command(char *buf, Server* serv, Client* client);

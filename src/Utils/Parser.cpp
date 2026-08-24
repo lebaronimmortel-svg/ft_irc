@@ -1,6 +1,6 @@
 #include "../../includes/Header.hpp"
 
-static int ft_strlen(const char *str)
+int ft_strlen(const char *str)
 {
     unsigned int i = 0;
 
