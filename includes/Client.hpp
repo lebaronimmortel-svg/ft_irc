@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Header.hpp"
+#include "Channel.hpp"
 
 enum authentification{
     PASSWORD,
@@ -57,6 +57,6 @@ class Client
         void        setFd(int fd);
         void        setBuffer(std::string);
 
-        int     is_chan_member();
+        //int     is_chan_member();
         void    addChannel(Channel* channel);
 };

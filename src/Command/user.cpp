@@ -18,7 +18,6 @@ void Server::user(std::string &str, int &i, Client &c){
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: already register");
 		return ;
 	}
-	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
 		this->reply(&c, ERR_NOSUCHCHANNEL, chan->getName() +  ": this channel doesn't exist");

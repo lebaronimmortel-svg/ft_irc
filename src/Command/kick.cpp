@@ -34,7 +34,7 @@ void Server::kick(std::string &str, int &i, Client &c){
 	if (arg.size() == 0)
 		return ;
 	size_t lenght = arg.size();
-	for (int i = 0; i < lenght; i++){
+	for (size_t i = 0; i < lenght; i++){
 		Client *user = chan->getMember(arg.at(i));
 		if (user == NULL){
 			this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");

@@ -16,7 +16,7 @@
 #include <sstream>
 
 void add_order(bool state, std::string &order, char c){
-	int find = order.find(c); 
+	size_t find = order.find(c); 
 	if (!state){
 		if (c == 'k')
 			return ;
@@ -28,8 +28,8 @@ void add_order(bool state, std::string &order, char c){
 	}
 }
 
-std::string get_word(std::string str, int &i, bool &end){
-	int lenght = str.length();
+std::string get_word(std::string str, size_t &i, bool &end){
+	size_t lenght = str.length();
 	for (; i < lenght && str[i] == ' '; i++);
 	int start = i;
 	bool word = false;
@@ -55,7 +55,7 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, std::string str){
 	short state = 0;
 	bool init_state = false;
 	std::string order = "";
-	int i = 0;
+	size_t i = 0;
 	for (; i < lenght; i++){
 		if (str[i] == '+')
 		{
@@ -101,7 +101,6 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, std::string str){
 		this->reply(c, ERR_NEEDMOREPARAMS, chan->getName() +  "need more parameter");
 		return (NULL);
 	}
-	int start = i;
 	std::vector<std::string> wvec;
 	size_t lenght_vec = 0;
 	bool end = false;
@@ -116,7 +115,7 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, std::string str){
 		return (args);
 	size_t order_l = order.length();
 	size_t vec_i = 0;
-	for (size_t y = 0; y < order_l; i++){
+	for (size_t y = 0; y < order_l; y++){
 		switch (order[y]){
 			case 'k':{
 				args->value.k = wvec.at(vec_i);
@@ -150,7 +149,7 @@ void Server::mode(std::string &str, int &i, Client &c){
 		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) + ": this channel doesn't exist");
 		return ;
 	}
-	if (!chan->getModerator(c.getNickName()) != NULL){
+	if (chan->getModerator(c.getNickName()) != NULL){
 		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": not an operator");
 		return ;
 	}
@@ -173,13 +172,13 @@ void Server::mode(std::string &str, int &i, Client &c){
 	else if (args->flag.k == 0){
 		chan->setPasswordRequirement(false);
 	}
-	if (args->flag.l = 1){
+	if (args->flag.l == 1){
 		chan->setUserLimit(args->value.l);
 	}
 	else if  (args->flag.l == 0)
 		chan->setUserLimit(0);
 	if (args->flag.o == 1){
-		for (int i = 0; i < args->value.o.size(); i++){
+		for (size_t i = 0; i < args->value.o.size(); i++){
 			Client *client = chan->getMember(args->value.o.at(i));
 			if (client != NULL)
 				chan->addModerator(client);
@@ -190,7 +189,7 @@ void Server::mode(std::string &str, int &i, Client &c){
 		}
 	}
 	else if (args->flag.o == 0){
-		for (int i = 0; i < args->value.o.size(); i++){
+		for (size_t i = 0; i < args->value.o.size(); i++){
 			Client *client = chan->getMember(args->value.o.at(i));
 			if (client != NULL)
 			{
@@ -204,4 +203,5 @@ void Server::mode(std::string &str, int &i, Client &c){
 			}
 		}
 	}
+	delete args;
 }

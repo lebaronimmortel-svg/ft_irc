@@ -26,7 +26,7 @@ CC	= c++
 
 # --- Directory ---
 
-SRC_DIR = ./src
+SRC_DIR = src
 DIR = $(SRC_DIR)
 
 OBJ_DIR = ./obj/$(DIR)
@@ -45,9 +45,7 @@ Command =	invite.cpp \
 			user.cpp \
 
 
-SUB_DIR = parsing utils hooks raycast player
-
-
+SUB_DIR = Channel Client Server Command
 
 VPATH := $(DIR) \
 	$(addprefix $(DIR)/, $(SUB_DIR))
