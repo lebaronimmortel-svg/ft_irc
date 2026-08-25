@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 22:18:47 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/25 15:15:07 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ cmdfunc Server::getcmd(std::string str){
 	if (i == lenght)
 		return (NULL);
 	int slash = i;
-	int sep = str.find(slash, ' ');
+	size_t sep = str.find(slash, ' ');
 	if (sep == str.npos)
 		sep = str.length();
 	std::string cmd = str.substr(slash, sep);
@@ -117,13 +117,13 @@ int Server::callcmd(std::string str, Client &c){
 
 std::vector<std::string> &Server::getArgsparse(std::string &str, char sep, int &i){
 	std::vector<std::string> vec;
-	int sep = str.find(sep);
+	size_t sep = str.find(sep);
 	if (sep == str.npos)
 		return (vec);
 	size_t lenght = str.length();
 	for (; i < lenght; i++){
 		vec.push_back(str.substr(i, sep));
-		i += sep;
+		i = sep;
 		for (;i < lenght && strchr("\0\r\n :", str[i]) == NULL; i++)
 		sep = str.find(sep, i);
 	}
@@ -145,6 +145,7 @@ Channel *Server::getChannelparse(std::string &str, int &i){
 	i = end;
 	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
 }
+
 std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, int &i){
 	std::vector<std::string> &args = this->getArgsparse(str, ',', i);
 	int lenght = args.size();
@@ -158,7 +159,7 @@ std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str,
 			if (find != this->_channels.end())
 				chanvec->push_back((*find).second);
 			else {
-				this->reply(c, ERR_NOSUCHCHANNEL, "this doen't exist");
+				chanvec->push_back(NULL);
 			}
 		}
 	}
@@ -170,4 +171,23 @@ void Server::reply(Client *c, reply_flag flag, std::string msg){
 	std::string message = ":ircserv " + replay_flag_value[flag] + " " + name
 	 + " " + msg + "\r\n";
 	send (c->getFd(), message.c_str(), message.size(), 0);
+}
+
+void Server::replyChannel(Channel *chan, std::string msg){
+	msg += "\r\n";
+	std::map<std::string, Client *> mem = chan->getMembers();
+	std::map<std::string, Client *>::iterator end = mem.end();
+	for (std::map<std::string, Client *>::iterator it = mem.begin(); it != end; it++){
+		send((*it).second->getFd(), msg.c_str(), msg.size(), 0);
+	}
+}
+
+void Server::HandleClient(Client *c){
+	std::string &buff = c->getBuffer();
+	size_t pos;
+	while ((pos = buff.find("\r\n")) != buff.npos){
+		std::string line = buff.substr(0, pos);
+		buff.erase(0, pos + 2);
+		this->callcmd(line, *c);
+	}
 }

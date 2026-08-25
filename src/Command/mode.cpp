@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 22:12:15 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/25 13:38:10 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ std::string get_word(std::string str, int &i, bool &end){
 	return (str.substr(start, i));
 }
 
-mode_s *Server::getflagmode(Client *c, std::string str){
+mode_s *Server::getflagmode(Channel *chan, Client *c, std::string str){
 	mode_s *args = new mode_s();
 	args->flag.i = -1;
 	args->flag.t = -1;
@@ -71,7 +71,7 @@ mode_s *Server::getflagmode(Client *c, std::string str){
 			break;
 		else if (!init_state || strchr("itkol", str[i]) == NULL)
 		{
-			this->reply(c, ERR_UMODEUNKNOWNFLAG, "unknown mode flag: " + str[i]);
+			this->reply(c, ERR_UMODEUNKNOWNFLAG, chan->getName() +  "unknown mode flag: " + str[i]);
 			continue;
 		}
 		else {
@@ -98,7 +98,7 @@ mode_s *Server::getflagmode(Client *c, std::string str){
 		}
 	}
 	if (!init_state){
-		this->reply(c, ERR_NEEDMOREPARAMS, "need more parameter");
+		this->reply(c, ERR_NEEDMOREPARAMS, chan->getName() +  "need more parameter");
 		return (NULL);
 	}
 	int start = i;
@@ -130,7 +130,7 @@ mode_s *Server::getflagmode(Client *c, std::string str){
 				std::istringstream is(wvec.at(vec_i));
 				is >> args->value.l;
 				if (is.fail() || !is.eof()){
-					this->reply(c, ERR_UNKNOWNMODE, "error conversion");
+					this->reply(c, ERR_UNKNOWNMODE, chan->getName() +  ": error conversion");
 				}
 			}
 		}
@@ -141,20 +141,20 @@ mode_s *Server::getflagmode(Client *c, std::string str){
 void Server::mode(std::string &str, int &i, Client &c){
 	if (!c.getAuthenticated())
 	{
-		this->reply(&c, ERR_NOTREGISTERED, "require to be registered");
+		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require to be registered");
 		return;
 	}
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
-		this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
+		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) + ": this channel doesn't exist");
 		return ;
 	}
 	if (!chan->getModerator(c.getNickName()) != NULL){
-		this->reply(&c, ERR_CHANOPRIVSNEEDED, "not an operator");
+		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": not an operator");
 		return ;
 	}
-	mode_s *args = this->getflagmode(&c, str);
+	mode_s *args = this->getflagmode(chan, &c, str);
 	if (args->flag.i == 1){
 		chan->setInviteOnlyStatus(true);
 	}
@@ -185,7 +185,7 @@ void Server::mode(std::string &str, int &i, Client &c){
 				chan->addModerator(client);
 			else
 			{
-				this->reply(&c, ERR_NOSUCHNICK, "no such nickname");
+				this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
 			}
 		}
 	}
@@ -200,7 +200,7 @@ void Server::mode(std::string &str, int &i, Client &c){
 			}
 			else
 			{
-				this->reply(&c, ERR_NOSUCHNICK, "no such nickname");
+				this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
 			}
 		}
 	}

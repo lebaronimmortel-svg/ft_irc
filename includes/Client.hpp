@@ -46,7 +46,7 @@ class Client
         std::string getUserName();
         bool        getAuthenticated();
         int         getFd();
-        std::string getBuffer();
+        std::string &getBuffer();
         size_t       &getAuthLevel();
 
         // setters

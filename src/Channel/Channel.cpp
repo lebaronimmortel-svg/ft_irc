@@ -27,6 +27,10 @@ Client* Channel::getMember(std::string username)
     }
 }
 
+std::map<std::string, Client*> Channel::getMembers(){
+    return this->_members;
+}
+
 Client* Channel::getModerator(std::string username)
 {
     try {
@@ -166,6 +170,16 @@ void Channel::delMember(Client *c){
         this->_members.at(c->getNickName());
         this->_members.erase(c->getNickName());
     } catch (std::exception &e){
+        return ;
+    }
+}
+
+void Channel::delInvited(Client *c){
+    try {
+        this->_invited.at(c->getNickName());
+        this->_invited.erase(c->getNickName());
+    }
+    catch (std::exception &e){
         return ;
     }
 }

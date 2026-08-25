@@ -1,15 +1,15 @@
 #pragma once
 
 
-#include "Reply.hpp"
-#include "Header.hpp"
 #include <sys/socket.h>
 #include <sys/epoll.h>
 #include <vector>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include "Command.hpp"
+#include <sstream>
+#include "Reply.hpp"
+#include "Header.hpp"
 
 #define MAX_EVENT 10
 #define TIMEOUT 180000
@@ -22,7 +22,9 @@
 	#endif
 #endif
 
+class Server;
 
+typedef void (Server::*cmdfunc)(std::string &str, int &i,Client &);
 
 class Server
 {
@@ -41,7 +43,7 @@ class Server
         std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
         Channel *getChannelparse(std::string &str, int &i);
         std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, int &i);
-        mode_s *getflagmode(Client *c, std::string str);
+        mode_t *getflagmode(Channel *, Client *c, std::string str);
 
     public :
 
@@ -51,8 +53,8 @@ class Server
         // getters
         inline std::map<std::string, Channel *> &getChannelList();
         inline const std::string getPassword() const;
-        inline const int getEpollFd() const;
-        inline const int getSocket() const;
+        inline  int getEpollFd() const;
+        inline  int getSocket() const;
         inline const sockaddr_in getAddress() const;
 
         // setters
@@ -65,9 +67,11 @@ class Server
         Client	*get_client(std::string username, int fd, int mode);
         cmdfunc	getcmd(std::string str);
         int		callcmd(std::string str, Client &);
+        void    HandleClient(Client *c);
 
         //reply
         void reply(Client *c, reply_flag flag, std::string msg);
+        void replyChannel(Channel *c, std::string msg);
 
         //command
         void invite(std::string &str, int &i, Client &);

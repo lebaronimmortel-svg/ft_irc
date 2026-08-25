@@ -41,6 +41,7 @@ class Channel
         std::string  getName();
         std::string  getPassword();
         Client*      getMember(std::string username);
+        std::map<std::string, Client*> getMembers();
         Client*      getModerator(std::string username);
         Client*      getInvited(std::string username);
         bool         getPasswordRequirement();
@@ -68,5 +69,6 @@ class Channel
         void        delModerator(Client *);
         void        addinvited(Client *);
         void        delMember(Client *);
+        void        delInvited(Client *);
 };
 

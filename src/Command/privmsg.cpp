@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 18:00:46 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 22:17:02 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/25 13:34:24 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 void Server::privmsg(std::string &str, int &i, Client &c){
 	if (!c.getAuthenticated())
 	{
-		this->reply(&c, ERR_NOTREGISTERED, "require registration");
+		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
 	std::vector<std::string> target;
@@ -39,7 +39,7 @@ void Server::privmsg(std::string &str, int &i, Client &c){
 		if (!name.empty() && name[0] == '#'){
 			std::map<std::string, Channel *>::iterator it = this->getChannelList().find(name);
 			if (it == this->getChannelList().end()){
-				this->reply(&c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
+				this->reply(&c, ERR_NOSUCHCHANNEL, "PRIVMSG: this channel doesn't exist");
 				continue;
 			}
 			Channel *chan = it->second;

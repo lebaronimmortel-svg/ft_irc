@@ -23,7 +23,6 @@ int main(int argc, char** argv)
 
 		for (int i = 0; i < ready; i++)
 		{
-			char *buf = NULL;
 			int fd = events[i].data.fd;
 
 			if (fd == server_socket) // new client
@@ -52,58 +51,11 @@ int main(int argc, char** argv)
 			{
 				// read socket client -> events[i].data.fd
 				// with \r\n
-				ssize_t bytes_read = recv(events[i].data.fd, buf, sizeof(buf), 0);
+				char buff[4096];
 				Client *client = serv.get_client("", events[i].data.fd, 1);
-				if (!client)
-				{
-					std::string nick = parse_auth(buf, 0);
-					std::string user = parse_auth(buf, 1);
-					std::string full = parse_auth(buf, 2);
-					if (!user.empty() && !serv.get_client(user, 0, 0))
-						serv.addClient(events[i].data.fd, nick, user, full);
-					else
-					{
-						std::cerr << "Error adding user" << user << " to the server: ";
-						if (user.empty())
-							std::cerr << "Wrong authentification syntax";
-						else if (serv.get_client(user, 0, 0))
-							std::cerr << "Username already in use";
-						std::cerr << std::endl;
-					}
-				}
-				else // traiter la commande
-				{		
-					if (!ft_strncmp(buf, "JOIN ", 5))
-					{
-						// cmd channel
-						std::string cmd = chan_join_cmd(buf);
-						if (!cmd.empty())
-						{
-							Channel *chan = serv.get_channel(cmd);
-							if (!chan)
-							{
-								chan = new Channel(cmd);
-								serv.addChannel(chan, cmd);
-							}
-							chan->addUser(client);
-							client->addChannel(chan);
-						}
-						else
-						{
-							// Unknown command
-						}
-					}
-					else if (!ft_strncmp(buf, "NICK ", 5))
-					{
-						std::string nick = nick_cmd(buf);
-						if (!nick.empty())
-							client->setNickName(nick);
-						else
-						{
-							// Unknown command
-						}
-					}
-				}
+				ssize_t bytes_read = recv(events[i].data.fd, buff, sizeof(buff), 0);
+				client->getBuffer().append(buff);
+				serv.HandleClient(client);
 			}
 			else if (events[i].events & (EPOLLERR | EPOLLHUP)) // client close the socket before the end of the transmission
 			{

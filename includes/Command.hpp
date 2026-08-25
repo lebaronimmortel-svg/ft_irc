@@ -6,15 +6,16 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:35:33 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 21:47:50 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/25 15:21:06 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <vector>
 #include <iostream>
+#include "Server.hpp"
 
-typedef void (Server::*cmdfunc)(std::string &str, int &i,Client &);
+
 
 enum cmdlistenum {
     INVITE,
