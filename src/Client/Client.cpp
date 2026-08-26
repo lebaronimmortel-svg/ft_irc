@@ -34,7 +34,7 @@ int Client::getFd()
     return _fd;
 }
 
-std::string Client::getBuffer()
+std::string &Client::getBuffer()
 {
     return _buffer;
 }
@@ -67,13 +67,6 @@ void Client::setFd(int fd)
 void Client::setBuffer(std::string buffer)
 {
     _buffer = buffer;
-}
-
-int Client::is_chan_member()
-{
-    if (_channels.empty())
-        return (0);
-    return (1);
 }
 
 void Client::addChannel(Channel* chan)

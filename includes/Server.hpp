@@ -10,6 +10,7 @@
 #include <sstream>
 #include "Reply.hpp"
 #include "Header.hpp"
+#include "Channel.hpp"
 
 #define MAX_EVENT 10
 #define TIMEOUT 180000
@@ -22,9 +23,28 @@
 	#endif
 #endif
 
+struct mode_flag{
+	short i;
+	short t;
+	short k;
+	short o;
+	short l;
+};
+
+struct mode_value{
+	std::string k;
+	size_t l;
+	std::vector<std::string> o;
+};
+
+struct mode_s{
+	mode_value value;
+	mode_flag flag;
+};
+
 class Server;
 
-typedef void (Server::*cmdfunc)(std::string &str, int &i,Client &);
+typedef void (Server::*cmdfunc)(std::string &str, size_t &i,Client &);
 
 class Server
 {
@@ -40,10 +60,10 @@ class Server
         int _epollfd;
         sockaddr_in _servaddr;
 
-        std::vector<std::string> &getArgsparse(std::string &str, char sep, int &i);
-        Channel *getChannelparse(std::string &str, int &i);
-        std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, int &i);
-        mode_t *getflagmode(Channel *, Client *c, std::string str);
+        std::vector<std::string> &getArgsparse(std::string &str, char sep, size_t &i);
+        Channel *getChannelparse(std::string &str, size_t&i);
+        std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, size_t &i);
+        mode_s *getflagmode(Channel *, Client *c, std::string str);
 
     public :
 
@@ -51,11 +71,11 @@ class Server
         ~Server();
 
         // getters
-        inline std::map<std::string, Channel *> &getChannelList();
+        std::map<std::string, Channel *> &getChannelList();
         inline const std::string getPassword() const;
-        inline  int getEpollFd() const;
-        inline  int getSocket() const;
-        inline const sockaddr_in getAddress() const;
+        int getEpollFd();
+        int getSocket();
+        sockaddr_in getAddress();
 
         // setters
         void    setPassword(std::string password);

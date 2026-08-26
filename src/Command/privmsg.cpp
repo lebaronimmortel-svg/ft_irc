@@ -43,7 +43,7 @@ void Server::privmsg(std::string &str, int &i, Client &c){
 				continue;
 			}
 			Channel *chan = it->second;
-			if (!chan->getMember(c.getNickName()) == NULL)
+			if (chan->getMember(c.getNickName()) == NULL)
 				continue;
 			std::string msg = ":" + c.getNickName() + "!" + c.getUserName() +
 							  "@localhost PRIVMSG " + chan->getName() + " :" + mess + "\r\n";

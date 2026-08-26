@@ -1,4 +1,5 @@
 #include "../../includes/Channel.hpp"
+#include "../../includes/Client.hpp"
 
 Channel::Channel() {}
 
@@ -132,16 +133,6 @@ void    Channel::setTopicLastModifierUsername(std::string username)
 void    Channel::setUserLimit(unsigned int limit)
 {
     _user_limit = limit;
-}
-
-std::string Channel::belongs_to_channel(int fd)
-{
-    for (std::map<std::string, Client *>::iterator i = _members.begin(); i != _members.end(); i++)
-    {
-        if (i->second->getFd() == fd)
-            return i->second->getUserName();
-    }
-    return ("");
 }
 
 void Channel::addUser(Client *client)

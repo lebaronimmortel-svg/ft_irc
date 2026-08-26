@@ -12,9 +12,6 @@
 
 #pragma once
 
-
-#pragma once
-
 #include <string>
 
 enum reply_flag{
@@ -64,7 +61,7 @@ enum reply_flag{
 	ERR_NOTREGISTERED, // :You have not = registered,
 };
 
-char *reply_flag_value[ERR_NOTREGISTERED + 2] = {
+std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
 	/* RPL_WELCOME */ "001",
 	/*RPL_WELCOME*/"001",
 	/*RPL_YOURHOST*/"002",

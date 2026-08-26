@@ -30,64 +30,54 @@ enum cmdlistenum {
 };
 
 struct cmdlist {
-    char *name;
+    std::string name;
     cmdfunc call;
 };
 
 cmdlist cmdLU[] = {
-    [INVITE] = {
+    /*[INVITE]*/
+	{
         .name = "INVITE",
-        .call = Server::invite,
+        .call = &Server::invite,
     },
-    [KICK] = {
+    /*[KICK]*/
+	{
         .name = "KICK",
-        .call =  Server::kick,
+        .call =  &Server::kick,
     },
-    [TOPIC] = {
+    /*[TOPIC]*/
+	{
         .name = "TOPIC",
-        .call =  Server::topic,
+        .call =  &Server::topic,
     },
-    [MODE] = {
+    /*[MODE]*/
+	{
         .name = "MODE",
-        .call =  Server::mode,
+        .call =  &Server::mode,
     },
-    [PASS] = {
+    /*[PASS]*/
+	{
         .name = "PASS",
-        .call =  Server::pass,
+        .call =  &Server::pass,
     },
-    [NICK] = {
+    /*[NICK]*/
+	{
         .name = "NICK",
-        .call =  Server::nick,
+        .call =  &Server::nick,
     },
-    [NAME] = {
+    /*[NAME]*/
+	{
         .name = "USER",
-        .call =  Server::user,
+        .call =  &Server::user,
     },
-    [JOIN] = {
+    /*[JOIN]*/
+	{
         .name = "JOIN",
-        .call =  Server::join,
+        .call =  &Server::join,
     },
-    [PRIVMSG] = {
+    /*[PRIVMSG]*/
+	{
         .name = "PRIVMSG",
-        .call =  Server::privmsg,
+        .call =  &Server::privmsg,
     },
-};
-
-struct mode_flag{
-	short i;
-	short t;
-	short k;
-	short o;
-	short l;
-};
-
-struct mode_value{
-	std::string k;
-	size_t l;
-	std::vector<std::string> o;
-};
-
-struct mode_s{
-	mode_value value;
-	mode_flag flag;
 };

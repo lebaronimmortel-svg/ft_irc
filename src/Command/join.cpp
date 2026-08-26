@@ -24,7 +24,6 @@ void Server::join(std::string &str, int &i, Client &c){
 	if (channels == NULL){
 		return ;
 	}
-	int cpy_args = i;
 	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
 	int lenght = channels->size();
 	int lenght_args = args.size();
@@ -38,7 +37,8 @@ void Server::join(std::string &str, int &i, Client &c){
 		}
 		if (chan->getMember(c.getNickName()) != NULL)
 			this->reply(&c, ERR_USERONCHANNEL, chan->getName() +  ": already on channel");
-		else{
+		else
+		{
 			if (chan->getInviteOnlyStatus()){
 				if (chan->getInvited(c.getNickName()) == NULL)
 				{

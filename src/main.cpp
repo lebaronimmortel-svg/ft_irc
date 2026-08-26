@@ -37,7 +37,9 @@ int main(int argc, char** argv)
 				struct epoll_event client_event = 
 				{
 					.events = EPOLLIN | EPOLLET,
-					.data.fd = client_fd,
+					.data = {
+						.fd = client_fd,
+					}
 				};
 
 				if (epoll_ctl(serv.getEpollFd(), EPOLL_CTL_ADD, client_fd, &client_event) < 0)
@@ -54,6 +56,8 @@ int main(int argc, char** argv)
 				char buff[4096];
 				Client *client = serv.get_client("", events[i].data.fd, 1);
 				ssize_t bytes_read = recv(events[i].data.fd, buff, sizeof(buff), 0);
+				if (bytes_read)
+					return 1;
 				client->getBuffer().append(buff);
 				serv.HandleClient(client);
 			}
