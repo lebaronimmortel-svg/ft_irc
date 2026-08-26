@@ -70,6 +70,5 @@ class Channel
         void        addinvited(Client *);
         void        delMember(Client *);
         void        delInvited(Client *);
-        void        delUser(Client *);
 };
 

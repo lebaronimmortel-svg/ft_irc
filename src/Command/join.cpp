@@ -6,20 +6,20 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 14:59:20 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:40:27 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-void Server::join(std::string &str, int &i, Client &c){
+void Server::join(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
-	int cpy = i;
+	size_t cpy = i;
 	std::vector<Channel *> *channels = this->getChannelListparse(&c, str, i);
 	if (channels == NULL){
 		return ;

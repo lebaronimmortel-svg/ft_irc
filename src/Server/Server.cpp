@@ -6,14 +6,103 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 15:15:07 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 16:12:06 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Server.hpp"
 #include "../../includes/Command.hpp"
+#include "../../includes/Client.hpp"
 #include <cstring>
 
+const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
+	/* RPL_WELCOME */ "001",
+	/*RPL_WELCOME*/"001",
+	/*RPL_YOURHOST*/"002",
+	/*RPL_CREATED*/"003",
+	/*RPL_MYINFO*/"004",
+	/*RPL_UMODEIS*/"221",
+	/*RPL_CHANNELMODEIS*/"324",
+	/*RPL_NOTOPIC*/"331",
+	/*RPL_TOPIC*/"332",
+	/*RPL_TOPICWHOTIME*/"333", 
+	/*RPL_INVITING*/"341",
+	/*RPL_NAMREPLY*/"353",
+	/*RPL_ENDOFNAMES*/"366",
+	/*ERR_NOSUCHNICK*/"401",
+	/*ERR_NOSUCHCHANNEL*/"403",
+	/*ERR_CANNOTSENDTOCHAN*/"404",
+	/*ERR_TOOMANYCHANNELS*/"405",
+	/*ERR_NORECIPIENT*/"411",
+	/*ERR_NOTEXTTOSEND*/"412",
+	/*ERR_UNKNOWNCOMMAND*/"421",
+	/*ERR_NONICKNAMEGIVEN*/"431",
+	/*ERR_ERRONEUSNICKNAME*/"432",
+	/*ERR_NICKNAMEINUSE*/"433",
+	/*ERR_USERNOTINCHANNEL*/"441",
+	/*ERR_NOTONCHANNEL*/"442", 
+	/*ERR_USERONCHANNEL*/"443",
+	/*ERR_NEEDMOREPARAMS*/"461",
+	/*ERR_ALREADYREGISTRED*/"462",
+	/*ERR_PASSWDMISMATCH*/"464", 
+	/*ERR_CHANNELISFULL*/"471",
+	/*ERR_UNKNOWNMODE*/"472",
+	/*ERR_INVITEONLYCHAN*/"473",
+	/*ERR_BADCHANNELKEY*/"475",
+	/*ERR_NOPRIVILEGES*/"481",
+	/*ERR_CHANOPRIVSNEEDED*/"482",
+	/*ERR_UMODEUNKNOWNFLAG*/"501",
+	/*ERR_USERSDONTMATCH*/"502",
+	/*ERR_NOTREGISTERED*/"451",
+};
+
+cmdlist cmdLU[] = {
+    /*[INVITE]*/
+	{
+        .name = "INVITE",
+        .call = &Server::invite,
+    },
+    /*[KICK]*/
+	{
+        .name = "KICK",
+        .call =  &Server::kick,
+    },
+    /*[TOPIC]*/
+	{
+        .name = "TOPIC",
+        .call =  &Server::topic,
+    },
+    /*[MODE]*/
+	{
+        .name = "MODE",
+        .call =  &Server::mode,
+    },
+    /*[PASS]*/
+	{
+        .name = "PASS",
+        .call =  &Server::pass,
+    },
+    /*[NICK]*/
+	{
+        .name = "NICK",
+        .call =  &Server::nick,
+    },
+    /*[NAME]*/
+	{
+        .name = "USER",
+        .call =  &Server::user,
+    },
+    /*[JOIN]*/
+	{
+        .name = "JOIN",
+        .call =  &Server::join,
+    },
+    /*[PRIVMSG]*/
+	{
+        .name = "PRIVMSG",
+        .call =  &Server::privmsg,
+    },
+};
 
 Server::Server(int port, std::string pass): _password(pass){
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -35,9 +124,9 @@ Server::Server(int port, std::string pass): _password(pass){
 		close(this->_servsock);
 		throw std::runtime_error("Error setting up listen limit");
 	}
-	this->_epollfd = epoll_create1(O_CLOEXEC);
-	if (this->_epollfd < 0){
-		close(this->_epollfd);
+	this->_epollfdserv = epoll_create1(O_CLOEXEC);
+	if (this->_epollfdserv < 0){
+		close(this->_epollfdserv);
 		throw std::runtime_error("Error Initialization Epoll");
 	}
 	struct epoll_event serv_event = {
@@ -46,15 +135,23 @@ Server::Server(int port, std::string pass): _password(pass){
 			.fd = STDIN_FILENO,
 		}
 	};
-	if (epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, this->_servsock, &serv_event) < 0){
+	if (epoll_ctl(this->_epollfdserv, EPOLL_CTL_ADD, this->_servsock, &serv_event) < 0){
 		close(this->_servsock);
-		close(this->_epollfd);
+		close(this->_epollfdserv);
 		throw std::runtime_error("Error adding event to listen queue");
 	}
+	this->_epollfd.push_back(this->_epollfdserv);
 }
 
-int Server::getEpollFd() {return this->_epollfd;};
+Server::~Server(){
+	size_t size = this->_epollfd.size();
+	for (size_t i = 0; i < size; i++)
+		close(this->_epollfd[i]);
+}
+
+int Server::getEpollFd() {return this->_epollfdserv;};
 int Server::getSocket() {return this->_servsock;};
+std::vector<int> &Server::getfdlist(){return this->_epollfd;};
 sockaddr_in Server::getAddress() {return this->_servaddr;};
 
 Client* Server::get_client(std::string username, int fd, int mode)

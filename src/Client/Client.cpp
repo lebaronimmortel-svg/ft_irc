@@ -1,4 +1,4 @@
-#include "../../includes/Header.hpp"
+#include "../../includes/Client.hpp"
 
 Client::Client() {}
 
@@ -74,7 +74,6 @@ void Client::addChannel(Channel* chan)
     if (_channels.find(chan->getName()) == _channels.end())
     {
         _channels.insert(std::make_pair(chan->getName(), chan));
-        std::cout << _username << " joined channel " << chan->getName() << std::endl;
     }
 }
 

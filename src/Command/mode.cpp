@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/22 12:32:51 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 13:38:10 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:39:55 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, std::string str){
 	return (args);
 }
 
-void Server::mode(std::string &str, int &i, Client &c){
+void Server::mode(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require to be registered");

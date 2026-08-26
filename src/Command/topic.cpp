@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 14:18:31 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:40:10 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../../includes/Client.hpp"
 #include <ctime>
 
-void Server::topic(std::string &str, int &i, Client &c){
+void Server::topic(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");

@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:00:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 13:37:43 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:39:50 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../../includes/Client.hpp"
 
 
-void Server::kick(std::string &str, int &i, Client &c){
+void Server::kick(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");

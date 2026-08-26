@@ -6,14 +6,14 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 13:38:44 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:40:01 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-void Server::pass(std::string &str, int &i, Client &c){
+void Server::pass(std::string &str, size_t &i, Client &c){
 	
 	if (c.getAuthenticated()){
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: is already register");

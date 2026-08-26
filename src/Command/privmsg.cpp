@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 18:00:46 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 13:34:24 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:40:59 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 #include "../../includes/Client.hpp"
 #include <cstring>
 
-void Server::privmsg(std::string &str, int &i, Client &c){
+void Server::privmsg(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
 	std::vector<std::string> target;
-	int lenght = str.length();
+	size_t lenght = str.length();
 	for (; i < lenght; i++){
 		int cpy = i;
 		for (;i < lenght && strchr("\0\r\n :", str[i]) == NULL; i++)
@@ -33,8 +33,8 @@ void Server::privmsg(std::string &str, int &i, Client &c){
 		return ;// no message
 	i++;
 	std::string mess = str.substr(i);
-	int size = target.size();
-	for (int y = 0; y < size; y++){
+	size_t size = target.size();
+	for (size_t y = 0; y < size; y++){
 		std::string name = target[y];
 		if (!name.empty() && name[0] == '#'){
 			std::map<std::string, Channel *>::iterator it = this->getChannelList().find(name);

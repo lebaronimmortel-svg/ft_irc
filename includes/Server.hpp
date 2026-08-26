@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <sstream>
 #include "Reply.hpp"
-#include "Header.hpp"
 #include "Channel.hpp"
 
 #define MAX_EVENT 10
@@ -57,8 +56,9 @@ class Server
         // password for the channel
         std::string _password;
         int _servsock;
-        int _epollfd;
+        int _epollfdserv;
         sockaddr_in _servaddr;
+        std::vector<int> _epollfd;
 
         std::vector<std::string> &getArgsparse(std::string &str, char sep, size_t &i);
         Channel *getChannelparse(std::string &str, size_t&i);
@@ -75,6 +75,7 @@ class Server
         inline const std::string getPassword() const;
         int getEpollFd();
         int getSocket();
+        std::vector<int> &getfdlist();
         sockaddr_in getAddress();
 
         // setters
@@ -94,26 +95,18 @@ class Server
         void replyChannel(Channel *c, std::string msg);
 
         //command
-        void invite(std::string &str, int &i, Client &);
-        void kick(std::string &str, int &i, Client &);
-        void topic(std::string &str, int &i, Client &);
-        void mode(std::string &str, int &i, Client &);
-        void pass(std::string &str, int &i, Client &);
-        void nick(std::string &str, int &i, Client &);
-        void user(std::string &str, int &i, Client &);
-        void join(std::string &str, int &i, Client &);
-        void privmsg(std::string &str, int &i, Client &);
-        Client *get_client(std::string username, int fd, int mode);
+        void invite(std::string &str, size_t &i, Client &);
+        void kick(std::string &str, size_t &i, Client &);
+        void topic(std::string &str, size_t &i, Client &);
+        void mode(std::string &str, size_t &i, Client &);
+        void pass(std::string &str, size_t &i, Client &);
+        void nick(std::string &str, size_t &i, Client &);
+        void user(std::string &str, size_t &i, Client &);
+        void join(std::string &str, size_t &i, Client &);
+        void privmsg(std::string &str, size_t &i, Client &);
         Channel *get_channel(std::string name);
 
         // setters
-        void    setPassword(std::string password);
-
-        Client *find_client(int fd);
-        void addClient(int client_fd, std::string nick, std::string user, std::string full);
         void addChannel(Channel *channel, std::string name);
 
-        // titouan
-        cmdfunc   getcmd(std::string str);
-        int        callcmd(std::string str, Client &);
 };

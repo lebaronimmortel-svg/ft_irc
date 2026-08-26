@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/25 13:38:32 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:39:59 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ bool nicknameValid(std::string &str){
 	return (true);
 }
 
-void Server::nick(std::string &str, int &i, Client &c){
+void Server::nick(std::string &str, size_t &i, Client &c){
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
