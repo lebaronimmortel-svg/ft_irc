@@ -78,6 +78,42 @@ int Client::is_chan_member()
 
 void Client::addChannel(Channel* chan)
 {
-    /// if (std::find(<chan->getName(), chan>) != _channels.end())
-     _channels.insert(std::make_pair(chan->getName(), chan));
+    if (_channels.find(chan->getName()) == _channels.end())
+    {
+        _channels.insert(std::make_pair(chan->getName(), chan));
+        std::cout << _username << " joined channel " << chan->getName() << std::endl;
+    }
+}
+
+void Client::addChannelInv(Channel* chan)
+{
+    if (_channels_inv.find(chan->getName()) == _channels_inv.end())
+        _channels_inv.insert(std::make_pair(chan->getName(), chan));
+}
+
+void Client::delChannel(Channel* chan)
+{
+    try {
+        this->_channels.at(chan->getName());
+        this->_channels.erase(chan->getName());
+    } catch (std::exception &e){
+        return ;
+    }
+}
+
+int     Client::is_invited(Channel* channel)
+{
+    if (_channels_inv.find(channel->getName()) == _channels.end())
+        return (0);
+    return (1);
+}
+
+void    Client::delInvChan(Channel *channel)
+{
+    try {
+        this->_channels_inv.at(channel->getName());
+        this->_channels_inv.erase(channel->getName());
+    } catch (std::exception &e){
+        return ;
+    }
 }

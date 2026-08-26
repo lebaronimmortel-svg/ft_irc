@@ -14,6 +14,7 @@ class Client
     private :
     
         std::map<std::string, Channel*> _channels;
+        std::map<std::string, Channel*> _channels_inv;
 
     	// identifier in the server
         std::string _nickname;
@@ -59,4 +60,8 @@ class Client
 
         int     is_chan_member();
         void    addChannel(Channel* channel);
+        void    addChannelInv(Channel* channel);
+        void    delChannel(Channel* channel);
+        int     is_invited(Channel* channel);
+        void    delInvChan(Channel *channel);
 };

@@ -166,6 +166,8 @@ void Channel::addinvited(Client  *c){
 }
 
 void Channel::delMember(Client *c){
+void Channel::delUser(Client *c)
+{
     try {
         this->_members.at(c->getNickName());
         this->_members.erase(c->getNickName());
