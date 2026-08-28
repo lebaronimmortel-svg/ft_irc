@@ -4,8 +4,8 @@ Client::Client() {}
 
 Client::~Client() {}
 
-Client::Client(std::string nick, std::string user, std::string full, bool auth, int fd) : 
-_nickname(nick), _username(user), _fullname(full), _authenticated(auth), _fd(fd), authLevel(0){}
+Client::Client(int fd) : 
+_nickname(""), _username(""), _fullname(""), _authenticated(0), _fd(fd), authLevel(0){}
 
 std::string Client::getNickName()
 {

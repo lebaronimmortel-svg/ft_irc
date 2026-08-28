@@ -132,7 +132,7 @@ Server::Server(int port, std::string pass): _password(pass){
 	struct epoll_event serv_event = {
 		.events = EPOLLIN,
 		.data = {
-			.fd = STDIN_FILENO,
+			.fd = this->_servsock,
 		}
 	};
 	if (epoll_ctl(this->_epollfdserv, EPOLL_CTL_ADD, this->_servsock, &serv_event) < 0){
@@ -156,21 +156,30 @@ sockaddr_in Server::getAddress() {return this->_servaddr;};
 
 Client* Server::get_client(std::string username, int fd, int mode)
 {
-	for (std::map<std::string, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
-		if (mode == 0 && i->first == username)
+		if (mode == 0 && i->second->getUserName() == username)
 			return (i->second);
-		if (mode == 1 && i->second->getFd() == fd)
+		if (mode == 1 && i->first == fd)
 			return (i->second);
 	}
 
 	return (NULL);
 }
 
-void Server::addClient(int client_fd, std::string nick, std::string user, std::string full)
+void Server::addClient(int client_fd)
 {
-	Client *client = new Client(nick, user, full, true, client_fd);
-	_clients.insert(std::make_pair(user ,client));
+	Client *client = new Client(client_fd);
+	_clients.insert(std::make_pair(client_fd ,client));
+}
+
+void	Server::removeClient(int fd)
+{
+	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
+	{
+		if (i->first == fd)
+			_clients.erase(i->first);
+	}
 }
 
 std::map<std::string, Channel *> &Server::getChannelList()

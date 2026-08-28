@@ -39,7 +39,7 @@ class Client
         // constructor/destructor
         Client();
         ~Client();
-        Client(std::string nick, std::string user, std::string full, bool auth, int fd);
+        Client(int fd);
 
         // getters
         std::string getNickName();

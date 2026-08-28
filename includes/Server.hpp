@@ -51,7 +51,7 @@ class Server
 
         // channels
         std::map<std::string, Channel*> _channels;
-        std::map<std::string, Client*> _clients;
+        std::map<int, Client*> _clients;
         
         // password for the channel
         std::string _password;
@@ -83,7 +83,8 @@ class Server
         Client	*find_client(int fd);
 
         // utils
-        void	addClient(int client_fd, std::string nick, std::string user, std::string full);
+        void	addClient(int client_fd);
+        void    removeClient(int fd);
         void	addChannel(Channel *channel);
         Client	*get_client(std::string username, int fd, int mode);
         cmdfunc	getcmd(std::string str);
