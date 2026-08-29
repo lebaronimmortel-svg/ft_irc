@@ -1,4 +1,5 @@
 #include "../../includes/Client.hpp"
+#include <iostream>
 
 Client::Client() {}
 
@@ -57,6 +58,15 @@ void Client::setUserName(std::string username)
 void Client::setAuthenticated(bool authenticated)
 {
     _authenticated = authenticated;
+    if (authenticated == true)
+        std::cout << _username <<" has authenticated successfuly" << std::endl;
+    else
+        std::cout << _username <<" has disauthenticated successfuly" << std::endl;
+}
+
+void   Client::setAuthLevel(size_t level)
+{
+    authLevel = level;
 }
 
 void Client::setFd(int fd)

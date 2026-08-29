@@ -162,6 +162,8 @@ Client* Server::get_client(std::string username, int fd, int mode)
 			return (i->second);
 		if (mode == 1 && i->first == fd)
 			return (i->second);
+		if (mode == 2 && i->second->getNickName() == username)
+			return (i->second);
 	}
 
 	return (NULL);
@@ -175,11 +177,7 @@ void Server::addClient(int client_fd)
 
 void	Server::removeClient(int fd)
 {
-	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
-	{
-		if (i->first == fd)
-			_clients.erase(i->first);
-	}
+	_clients.erase(fd);
 }
 
 std::map<std::string, Channel *> &Server::getChannelList()
@@ -190,6 +188,15 @@ std::map<std::string, Channel *> &Server::getChannelList()
 void Server::addChannel(Channel *chan)
 {
 	this->_channels[chan->getName()] = chan;
+}
+
+static std::string cmd_pfx(std::string str)
+{
+	unsigned long i = 0;
+	std::string res = "";
+	while (i < str.size() && str[i] != ' ')
+		res += str[i++];
+	return res;
 }
 
 cmdfunc Server::getcmd(std::string str){
@@ -206,7 +213,7 @@ cmdfunc Server::getcmd(std::string str){
 		sep = str.length();
 	std::string cmd = str.substr(slash, sep);
 	for (int i = 0; i < PRIVMSG + 1; i++){
-		if (cmd ==  cmdLU[i].name)
+		if (cmd_pfx(cmd) ==  cmdLU[i].name)
 			return cmdLU[i].call;
 	}
 	return (NULL);

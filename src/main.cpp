@@ -2,6 +2,21 @@
 #include "../includes/Client.hpp"
 #include <iostream>
 
+std::string cmd_sfx(std::string str)
+{
+	unsigned long i = 0;
+	unsigned long len = str.size();
+	std::string res = "";
+	while (i < len && str[i] != ' ')
+		i++;
+	if (i == len)
+		return res;
+	i++;
+	while (i < len && str[i] != ' ')
+			res += str[i++];
+	return res;
+}
+
 int main(int argc, char** argv)
 {
 	(void) argv;
@@ -9,7 +24,6 @@ int main(int argc, char** argv)
 	if (argc != 3)
 	{
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
-		std::cout << "FRUIT" << std::endl; // debug
 		return (1);
 	}
 	size_t port;
@@ -17,7 +31,6 @@ int main(int argc, char** argv)
 	oss >> port;
 	if (oss.fail() || !oss.eof()){
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
-		std::cout << "ARBRE" << std::endl; // debug
 		return (1);
 	}
 
@@ -36,7 +49,7 @@ int main(int argc, char** argv)
 			int fd = events[i].data.fd;
 			if (fd == server_socket) // new client
 			{
-				std::cout << "New client connected !" << std::endl;
+				std::cout << "New client has connected !" << std::endl;
 				int client_fd = accept(server_socket, NULL, NULL);
 				if (client_fd == -1)
 					continue;
@@ -60,9 +73,6 @@ int main(int argc, char** argv)
 			} 
 			else if (events[i].events & EPOLLIN)
 			{
-				// // read socket client -> events[i].data.fd
-				// // with \r\n
-				//std::cout << "New client connected !" << std::endl;
 				char buff[4097];
 				Client *client = serv.get_client("", fd, 1);
 				ssize_t bytes_read = recv(fd, buff, sizeof(buff), 0);
@@ -72,7 +82,6 @@ int main(int argc, char** argv)
 					epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
 					close(fd);
 					serv.removeClient(fd);
-					std::cout << "prout" << std::endl;
 					continue ;
 				}
 				else if (bytes_read > 0)
@@ -81,7 +90,6 @@ int main(int argc, char** argv)
 						buff[bytes_read] = '\0';
 					else
 						buff[4097] = '\0';
-					std::cout << client << std::endl; //debug
 					client->getBuffer().append(buff);
 					serv.HandleClient(client);
 				}
@@ -95,6 +103,5 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	std::cout << "FLEUR" << std::endl; // debug
 	return (0);
 }

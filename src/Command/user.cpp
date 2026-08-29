@@ -13,25 +13,30 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+std::string cmd_sfx(std::string str);
+
 void Server::user(std::string &str, size_t &i, Client &c){
 	if (c.getAuthenticated()){
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: already register");
 		return ;
 	}
+	/*
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL){
 		this->reply(&c, ERR_NOSUCHCHANNEL, chan->getName() +  ": this channel doesn't exist");
 		return ;
 	}
+	*/
 	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
 	if (args.size() == 0){
-		this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": require more parameter");
+		this->reply(&c, ERR_NEEDMOREPARAMS, str +  ": require more parameter");
 		return ;
 	}
-	c.setUserName(args.at(0));
-	c.getAuthLevel() |= (1 << USERNAME);
+	c.setUserName(cmd_sfx(str));
+	c.setAuthLevel(c.getAuthLevel() | (1 << USERNAME));
+
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthenticated() & reqperm) == reqperm){
+	if ((c.getAuthLevel() & reqperm) == reqperm){
 		c.setAuthenticated(true);
 	}
 }

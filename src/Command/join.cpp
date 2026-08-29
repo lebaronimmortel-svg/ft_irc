@@ -27,6 +27,7 @@ void Server::join(std::string &str, size_t &i, Client &c){
 	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
 	int lenght = channels->size();
 	int lenght_args = args.size();
+	std::cout << lenght << " " << lenght_args << std::endl;
 	for (int i = 0; i < lenght; i++){
 		Channel *chan = channels->operator[](i);
 		if (!chan){
@@ -34,8 +35,9 @@ void Server::join(std::string &str, size_t &i, Client &c){
 			Channel *nchan = new Channel(name);
 			this->addChannel(nchan);
 			nchan->addUser(&c);
+			std::cout << "User " << c.getUserName() << " has joined channel " << chan->getName() << std::endl;
 		}
-		if (chan->getMember(c.getNickName()) != NULL)
+		if (chan->getMember(c.getUserName()) != NULL)
 			this->reply(&c, ERR_USERONCHANNEL, chan->getName() +  ": already on channel");
 		else
 		{
@@ -64,6 +66,7 @@ void Server::join(std::string &str, size_t &i, Client &c){
 			}
 			chan->addUser(&c);
 			chan->delInvited(&c);
+			std::cout << "User " << c.getUserName() << " has joined channel " << chan->getName() << std::endl; 
 		}
 	}
 }

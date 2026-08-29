@@ -48,7 +48,7 @@ class Client
         bool        getAuthenticated();
         int         getFd();
         std::string &getBuffer();
-        size_t       &getAuthLevel();
+        size_t      &getAuthLevel();
 
         // setters
         void        setNickName(std::string nickname);
@@ -56,6 +56,7 @@ class Client
         void        setUserName(std::string username);
         void        setAuthenticated(bool authenticated); 
         void        setFd(int fd);
+        void        setAuthLevel(size_t level);
         void        setBuffer(std::string);
 
         //int     is_chan_member();

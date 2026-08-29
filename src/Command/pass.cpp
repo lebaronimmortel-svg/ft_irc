@@ -13,29 +13,26 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-void Server::pass(std::string &str, size_t &i, Client &c){
-	
+std::string cmd_sfx(std::string str);
+
+void Server::pass(std::string &str, size_t &i, Client &c)
+{	
+	(void) i;
+
 	if (c.getAuthenticated()){
-		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: is already register");
+		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: user already registered");
 		return ;
 	}
-	Channel *chan = this->getChannelparse(str, i);
-	if (chan == NULL){
-		this->reply(&c, ERR_NOSUCHCHANNEL, chan->getName() +  ": this channel doesn't exist");
+	if (cmd_sfx(str) != _password)
+	{
+		this->reply(&c, ERR_PASSWDMISMATCH, "IRCServer: wrong password");
+		c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
 		return ;
 	}
-	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
-	if (args.size() == 0){
-		this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": require a parameter");
-		return ;
-	}
-	if (args.at(0) != chan->getPassword()){
-		this->reply(&c, ERR_PASSWDMISMATCH, chan->getName() +  ": incorect password");
-		return ;
-	};
-	c.getAuthLevel() |= (1 << PASSWORD);
+	c.setAuthLevel(c.getAuthLevel() | (1 << PASSWORD));
+
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthenticated() & reqperm) == reqperm){
+	if ((c.getAuthLevel() & reqperm) == reqperm){
 		c.setAuthenticated(true);
 	} 
 }
