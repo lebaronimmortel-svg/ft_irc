@@ -34,7 +34,7 @@ OBJ_DIR = ./obj/$(DIR)
 Channel = Channel.cpp
 Client = Client.cpp
 Server = Server.cpp
-Utils = Print.cpp Parsing.cpp
+Utils = Print.cpp Parsing.cpp Authentification.cpp
 Command =	invite.cpp \
 			join.cpp \
 			kick.cpp \

@@ -15,6 +15,7 @@
 
 std::string cmd_sfx(std::string str);
 void reset_auth_level(Server* serv, Client& c, int mode);
+void check_auth(Server *serv, Client& c);
 
 bool nicknameValid(std::string str){
 	size_t length = str.length();
@@ -38,13 +39,26 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 {
 	(void) i;
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
+
+
+	/*
 	if (args.size() == 0){
 		this->reply(&c, ERR_NONICKNAMEGIVEN, str +  ": require a nickname");
 		return ;
 	}
+	*/
+
 	std::string name = cmd_sfx(str);
 	if (nicknameValid(name) && this->get_client(name, 0, 2) == NULL)
-		c.setNickAuthString(1);
+	{
+		if (c.getAuthenticated() == 1)
+		{
+			c.setNickName(name);
+			return ;
+		}
+		else
+			c.setNickAuthString(1);
+	}
 	c.setNickAuth(name);
 	if (c.getAuthenticated())
 		return ;
@@ -52,30 +66,6 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm)
 	{
-		if (c.getPassAuth() == 0)
-		{
-			reset_auth_level(this, c, 0);
-			return ;
-		}
-		else if (c.getUserAuthString() == 0)
-		{
-			reset_auth_level(this, c, 1);
-			return ;
-		}
-		else if (c.getNickAuthString() == 0)
-		{
-			if (!nicknameValid(name))
-				reset_auth_level(this, c, 3);
-			else if (this->get_client(name, 0, 2) != NULL)
-				reset_auth_level(this, c, 2);
-			return ;
-		}
-		else
-		{
-			this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
-			c.setNickName(c.getNickAuth());
-			c.setUserName(c.getUserAuth());
-			c.setAuthenticated(true);
-		}
+		check_auth(this, c);
 	}
 }
