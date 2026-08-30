@@ -31,7 +31,7 @@ void Server::invite(std::string &str, size_t &i, Client &c){
 		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": require to be operator");
 		return ;
 	}
-	std::vector<std::string> arg = this->getArgsparse(str, ' ', i);
+	std::vector<std::string> arg = this->getArgsparse(str, ' ');
 	if (arg.size() == 0)
 		return;
 	size_t lenght = arg.size();

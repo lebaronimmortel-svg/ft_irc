@@ -13,32 +13,52 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+std::string cmd_sfx_ref(std::string& str);
+
 void Server::join(std::string &str, size_t &i, Client &c){
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
-	size_t cpy = i;
 	std::vector<Channel *> *channels = this->getChannelListparse(&c, str, i);
 	if (channels == NULL){
 		return ;
 	}
-	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
+
+	std::vector<std::string> args = this->getArgsparse(str, ' ');
+
+
 	int lenght = channels->size();
 	int lenght_args = args.size();
-	std::cout << lenght << " " << lenght_args << std::endl;
-	for (int i = 0; i < lenght; i++){
+
+	
+	for (int i = 0; i < lenght; i++)
+	{
 		Channel *chan = channels->operator[](i);
-		if (!chan){
-			std::string name = this->getArgsparse(str, ',', cpy).at(i);
+
+		if (!chan)
+		{
+			
+			std::string name = this->getArgsparse(cmd_sfx_ref(str), ',').at(i);
+			if (name.empty() || name[0] != '#')
+				continue ;
 			Channel *nchan = new Channel(name);
 			this->addChannel(nchan);
 			nchan->addUser(&c);
-			std::cout << "User " << c.getUserName() << " has joined channel " << chan->getName() << std::endl;
+
+			std::cout << std::endl << BLUE << "╔════════════════════════════╗" << RESET << std::endl;
+			std::cout << BLUE << "║ Client created new channel ║" << std::endl;
+			std::cout << BLUE << "╚════════════════════════════╝" << RESET << std::endl;
+			std::cout << BLUE << "nickname: " << RESET << c.getNickName() << std::endl;
+			std::cout << BLUE << "created: " << RESET << nchan->getName() << std::endl << std::endl;
+			this->reply(&c, RPL_WELCOME, ": welcome on channel: " + name);
+			
 		}
-		if (chan->getMember(c.getUserName()) != NULL)
+
+		else if (chan->getMember(c.getUserName()) != NULL)
 			this->reply(&c, ERR_USERONCHANNEL, chan->getName() +  ": already on channel");
+
 		else
 		{
 			if (chan->getInviteOnlyStatus()){
@@ -66,7 +86,15 @@ void Server::join(std::string &str, size_t &i, Client &c){
 			}
 			chan->addUser(&c);
 			chan->delInvited(&c);
-			std::cout << "User " << c.getUserName() << " has joined channel " << chan->getName() << std::endl; 
+
+			std::cout << std::endl << BLUE << "╔═══════════════════════════╗" << RESET << std::endl;
+			std::cout << BLUE << "║ Client joined new channel ║" << std::endl;
+			std::cout << BLUE << "╚═══════════════════════════╝" << RESET << std::endl;
+			std::cout << BLUE << "nickname: " << RESET << c.getNickName() << std::endl;
+			std::cout << BLUE << "joined: " << RESET << chan->getName() << std::endl << std::endl;
+
+
+			this->reply(&c, RPL_WELCOME, ": welcome on channel " + chan->getName());
 		}
 	}
 }

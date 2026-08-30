@@ -15,19 +15,14 @@
 
 std::string cmd_sfx(std::string str);
 
-void Server::user(std::string &str, size_t &i, Client &c){
+void Server::user(std::string &str, size_t &i, Client &c)
+{
+	(void) i;
 	if (c.getAuthenticated()){
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: already register");
 		return ;
 	}
-	/*
-	Channel *chan = this->getChannelparse(str, i);
-	if (chan == NULL){
-		this->reply(&c, ERR_NOSUCHCHANNEL, chan->getName() +  ": this channel doesn't exist");
-		return ;
-	}
-	*/
-	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
+	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	if (args.size() == 0){
 		this->reply(&c, ERR_NEEDMOREPARAMS, str +  ": require more parameter");
 		return ;
@@ -37,6 +32,7 @@ void Server::user(std::string &str, size_t &i, Client &c){
 
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm){
+		this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
 		c.setAuthenticated(true);
 	}
 }

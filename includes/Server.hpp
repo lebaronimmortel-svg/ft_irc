@@ -1,5 +1,9 @@
 #pragma once
 
+#define RESET   "\033[0m"      
+#define GREEN   "\033[32m"          
+#define BLUE    "\033[34m"          
+#define BOLD    "\033[1m"
 
 #include <sys/socket.h>
 #include <sys/epoll.h>
@@ -60,7 +64,7 @@ class Server
         sockaddr_in _servaddr;
         std::vector<int> _epollfd;
 
-        std::vector<std::string> &getArgsparse(std::string &str, char sep, size_t &i);
+        std::vector<std::string> getArgsparse(std::string str, char sep);
         Channel *getChannelparse(std::string &str, size_t&i);
         std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, size_t &i);
         mode_s *getflagmode(Channel *, Client *c, std::string str);
@@ -109,5 +113,7 @@ class Server
 
         // setters
         void addChannel(Channel *channel, std::string name);
+
+        void clean();
 
 };

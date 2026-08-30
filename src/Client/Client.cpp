@@ -1,4 +1,5 @@
 #include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
 #include <iostream>
 
 Client::Client() {}
@@ -59,9 +60,14 @@ void Client::setAuthenticated(bool authenticated)
 {
     _authenticated = authenticated;
     if (authenticated == true)
-        std::cout << _username <<" has authenticated successfuly" << std::endl;
-    else
-        std::cout << _username <<" has disauthenticated successfuly" << std::endl;
+    {
+        std::cout << std::endl << BLUE << "╔══════════════════════════╗" << RESET << std::endl;
+        std::cout << BLUE << "║ New client joined server ║" << std::endl;
+        std::cout << BLUE << "╚══════════════════════════╝" << RESET << std::endl;
+        std ::cout << BLUE << "username: " << RESET << _username << std::endl << BLUE << "nickname: " << RESET << _nickname << std::endl;
+        std::cout << BLUE << "fil_desc: " << RESET << _fd << std::endl << std::endl;
+    }
+
 }
 
 void   Client::setAuthLevel(size_t level)
@@ -85,6 +91,22 @@ void Client::addChannel(Channel* chan)
     {
         _channels.insert(std::make_pair(chan->getName(), chan));
     }
+}
+
+void Client::leaveAllChannels()
+{
+    std::map<std::string, Channel*> chans_copy = this->_channels;
+    std::map<std::string, Channel*>::iterator it;
+
+    for (it = chans_copy.begin(); it != chans_copy.end(); ++it)
+    {
+        Channel *chan = it->second;
+        if (chan != NULL)
+        {
+            chan->delMember(this);
+        }
+    }
+    this->_channels.clear();
 }
 
 void Client::addChannelInv(Channel* chan)

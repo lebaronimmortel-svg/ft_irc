@@ -1,5 +1,8 @@
 #include "../../includes/Channel.hpp"
 #include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
+#include <iostream>
+#include <string>
 
 Channel::Channel() {}
 
@@ -137,7 +140,8 @@ void    Channel::setUserLimit(unsigned int limit)
 
 void Channel::addUser(Client *client)
 {
-    _members.insert(std::make_pair(client->getUserName(), client));
+    _members.insert(std::make_pair(client->getNickName(), client));
+    client->addChannel(this);
 } 
 void Channel::addModerator(Client *c){
     this->_moderators[c->getNickName()] = c; 
@@ -158,10 +162,18 @@ void Channel::addinvited(Client  *c){
 
 void Channel::delMember(Client *c)
 {
-    try {
+    try 
+    {
         this->_members.at(c->getNickName());
         this->_members.erase(c->getNickName());
-    } catch (std::exception &e){
+        std::cout << std::endl << BLUE << "╔═════════════════════╗" << RESET << std::endl;
+        std::cout << BLUE << "║ Client quit channel ║" << std::endl;
+        std::cout << BLUE << "╚═════════════════════╝" << RESET << std::endl;
+        std::cout << BLUE << "nickname: " << RESET << c->getNickName() << std::endl;
+        std::cout << BLUE << "quit: " << RESET << _name << std::endl << std::endl;
+    } 
+    catch (std::exception &e)
+    {
         return ;
     }
 }

@@ -33,6 +33,7 @@ void Server::pass(std::string &str, size_t &i, Client &c)
 
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm){
+		this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
 		c.setAuthenticated(true);
 	} 
 }

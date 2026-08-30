@@ -27,7 +27,7 @@ void Server::topic(std::string &str, size_t &i, Client &c){
 		return ;
 	}
 	
-	std::vector<std::string> arg = this->getArgsparse(str, ' ', i);
+	std::vector<std::string> arg = this->getArgsparse(str, ' ');
 	if (arg.size() == 0){
 		if (chan->getTopic().empty()){
 			this->reply(&c, RPL_NOTOPIC, chan->getName() +  ": no topic set");

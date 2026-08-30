@@ -49,6 +49,7 @@ class Client
         int         getFd();
         std::string &getBuffer();
         size_t      &getAuthLevel();
+        const std::map<std::string, Channel*>& getChannels() const { return _channels; }
 
         // setters
         void        setNickName(std::string nickname);
@@ -65,4 +66,5 @@ class Client
         void    delChannel(Channel* channel);
         int     is_invited(Channel* channel);
         void    delInvChan(Channel *channel);
+        void    leaveAllChannels();
 };

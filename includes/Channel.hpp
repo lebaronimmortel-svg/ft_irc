@@ -63,6 +63,8 @@ class Channel
         void         setTopicLastModifierUsername(std::string username);
         void         setUserLimit(unsigned int limit);
 
+        const std::map<std::string, Client*>& getMembers() const { return _members; }
+
         //std::string belongs_to_channel(int fd);
         void        addUser(Client *client);
         void        addModerator(Client *);

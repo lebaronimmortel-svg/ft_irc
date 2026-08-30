@@ -40,6 +40,8 @@ int main(int argc, char** argv)
 	struct epoll_event events[MAX_EVENT];
 	while (1)
 	{
+		
+
 		int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
 		if (ready == -1)
 			break;
@@ -49,10 +51,14 @@ int main(int argc, char** argv)
 			int fd = events[i].data.fd;
 			if (fd == server_socket) // new client
 			{
-				std::cout << "New client has connected !" << std::endl;
 				int client_fd = accept(server_socket, NULL, NULL);
 				if (client_fd == -1)
 					continue;
+
+				std::cout << std::endl << BLUE << "╔═════════════════════════╗" << RESET << std::endl;
+				std::cout << BLUE << "║ New connection received ║" << std::endl;
+				std::cout << BLUE << "╚═════════════════════════╝" << RESET << std::endl;
+				std::cout << BLUE << "fil_desc: " << RESET << client_fd << std::endl << std::endl;
 
 				struct epoll_event client_event = 
 				{
@@ -78,10 +84,19 @@ int main(int argc, char** argv)
 				ssize_t bytes_read = recv(fd, buff, sizeof(buff), 0);
 				if (bytes_read == 0)
 				{
-					
+					std::string user = client->getUserName();
+					std::string nick = client->getNickName();	
 					epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
 					close(fd);
 					serv.removeClient(fd);
+					client->leaveAllChannels();
+					std::cout << std::endl << BLUE << "╔════════════════════╗" << RESET << std::endl;
+					std::cout << BLUE << "║ Client quit server ║" << std::endl;
+					std::cout << BLUE << "╚════════════════════╝" << RESET << std::endl;
+					std::cout << BLUE << "username: " << RESET << user << std::endl;
+					std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
+					std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;
+					serv.clean(); // removes empty_channels
 					continue ;
 				}
 				else if (bytes_read > 0)
@@ -89,18 +104,29 @@ int main(int argc, char** argv)
 					if (bytes_read < 4097)
 						buff[bytes_read] = '\0';
 					else
-						buff[4097] = '\0';
+						buff[4096] = '\0';
 					client->getBuffer().append(buff);
 					serv.HandleClient(client);
 				}
 			}
 			else if (events[i].events & (EPOLLERR | EPOLLHUP)) // client close the socket before the end of the transmission
 			{
-				
+				Client *client = serv.get_client("", fd, 1);
+				std::string user = client->getUserName();
+				std::string nick = client->getNickName();
 				epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
 				close(fd);
+				client->leaveAllChannels();
+				std::cout << std::endl << BLUE << "╔════════════════════╗" << RESET << std::endl;
+				std::cout << BLUE << "║ Client quit server ║" << std::endl;
+				std::cout << BLUE << "╚════════════════════╝" << RESET << std::endl;
+				std::cout << BLUE << "username: " << RESET << user << std::endl;
+				std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
+				std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;
 				serv.removeClient(fd);
+				serv.clean(); // removes empty_channels
 			}
+
 		}
 	}
 	return (0);

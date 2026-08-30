@@ -177,6 +177,10 @@ void Server::addClient(int client_fd)
 
 void	Server::removeClient(int fd)
 {
+	/*
+	pour tous les channels ou le client est present, l'effacer (chan.delMember(nickname))
+	*/
+
 	_clients.erase(fd);
 }
 
@@ -233,19 +237,18 @@ int Server::callcmd(std::string str, Client &c){
 	return 1;
 }
 
-std::vector<std::string> &Server::getArgsparse(std::string &str, char sep, size_t &i){
-	std::vector<std::string> *vec = new std::vector<std::string>();
-	size_t find = str.find(sep);
-	if (find == str.npos)
-		return (*vec);
-	size_t lenght = str.length();
-	for (; i < lenght; i++){
-		vec->push_back(str.substr(i, find));
-		i = find;
-		for (;i < lenght && strchr("\0\r\n :", str[i]) == NULL; i++)
-		find = str.find(sep, i);
-	}
-	return (*vec);
+std::vector<std::string> Server::getArgsparse(std::string str, char sep)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream ss(str);
+
+    while (std::getline(ss, token, sep))
+    {
+        if (!token.empty())
+            tokens.push_back(token);
+    }
+    return tokens;
 }
 
 Channel *Server::getChannelparse(std::string &str, size_t &i){
@@ -264,24 +267,75 @@ Channel *Server::getChannelparse(std::string &str, size_t &i){
 	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
 }
 
-std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, size_t &i){
-	std::vector<std::string> &args = this->getArgsparse(str, ',', i);
-	int lenght = args.size();
-	std::vector<Channel *> *chanvec = new std::vector<Channel *>();
-	for (int y = 0; y < lenght; y++){
-		if (args[y][0] != '#'){
-			this->reply(c, ERR_NOSUCHCHANNEL, "this channel doesn't exist");
-		}
-		else{
-			std::map<std::string, Channel *>::iterator find = this->_channels.find(args[y]);
-			if (find != this->_channels.end())
-				chanvec->push_back((*find).second);
-			else {
-				chanvec->push_back(NULL);
-			}
-		}
-	}
-	return (chanvec);
+std::string cmd_sfx_ref(std::string& str)
+{
+	unsigned long i = 0;
+	unsigned long len = str.size();
+	std::string res = "";
+	while (i < len && str[i] != ' ')
+		i++;
+	if (i == len)
+		return res;
+	i++;
+	while (i < len)
+			res += str[i++];
+	return res;
+}
+
+std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, size_t &i)
+{
+    (void) i;
+    std::string params = cmd_sfx_ref(str);
+    
+    size_t space_pos = params.find(' ');
+    std::string chan_list_str = (space_pos != std::string::npos) ? params.substr(0, space_pos) : params;
+
+    std::vector<std::string> chan_names = this->getArgsparse(chan_list_str, ',');
+    std::vector<Channel *> *chanvec = new std::vector<Channel *>();
+
+    for (size_t y = 0; y < chan_names.size(); ++y)
+    {
+        std::string chan_name = chan_names[y];
+
+        size_t crlf = chan_name.find_first_of("\r\n");
+        if (crlf != std::string::npos)
+            chan_name = chan_name.substr(0, crlf);
+
+        if (chan_name.empty() || chan_name[0] != '#')
+            this->reply(c, ERR_NOSUCHCHANNEL, chan_name + " :No such channel");
+
+        std::map<std::string, Channel *>::iterator it = this->_channels.find(chan_name);
+        if (it != this->_channels.end())
+            chanvec->push_back(it->second);
+        else
+            chanvec->push_back(NULL);
+    }
+
+    return chanvec;
+}
+
+void Server::clean()
+{
+    std::map<std::string, Channel*>::iterator it = _channels.begin();
+
+    while (it != _channels.end())
+    {
+        Channel *chan = it->second;
+
+        if (chan != NULL && chan->getMembers().empty())
+        {
+            std::cout << std::endl << BLUE << "╔═════════════════╗" << RESET << std::endl;
+            std::cout << BLUE << "║ Channel deleted ║" << std::endl;
+            std::cout << BLUE << "╚═════════════════╝" << RESET << std::endl;
+            std::cout << BLUE << "channel: " << RESET << it->first << std::endl << std::endl;
+
+            _channels.erase(it++);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void Server::reply(Client *c, reply_flag flag, std::string msg){

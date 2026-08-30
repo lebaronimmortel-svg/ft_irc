@@ -35,7 +35,8 @@ bool nicknameValid(std::string str){
 
 void Server::nick(std::string &str, size_t &i, Client &c)
 {
-	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
+	(void) i;
+	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	if (args.size() == 0){
 		this->reply(&c, ERR_NONICKNAMEGIVEN, str +  ": require a nickname");
 		return ;
@@ -54,7 +55,9 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 		return ;
 	c.setAuthLevel(c.getAuthLevel() | (1 << NICKNAME));
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthLevel() & reqperm) == reqperm){
+	if ((c.getAuthLevel() & reqperm) == reqperm)
+	{
+		this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
 		c.setAuthenticated(true);
 	}
 }
