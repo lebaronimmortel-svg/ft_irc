@@ -156,15 +156,13 @@ int Server::getSocket() {return this->_servsock;};
 std::vector<int> &Server::getfdlist(){return this->_epollfd;};
 sockaddr_in Server::getAddress() {return this->_servaddr;};
 
-Client* Server::get_client(std::string username, int fd, int mode)
+Client* Server::get_client(std::string nickname, int fd, int mode)
 {
 	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
-		if (mode == 0 && i->second->getUserName() == username)
+		if (mode == 0 && i->second->getNickName() == nickname)
 			return (i->second);
 		if (mode == 1 && i->first == fd)
-			return (i->second);
-		if (mode == 2 && i->second->getNickName() == username)
 			return (i->second);
 	}
 
@@ -339,10 +337,12 @@ void Server::replyChannel(Channel *chan, std::string msg){
 	}
 }
 
-void Server::HandleClient(Client *c){
+void Server::HandleClient(Client *c)
+{
 	std::string &buff = c->getBuffer();
 	size_t pos;
-	while ((pos = buff.find("\r\n")) != buff.npos){
+	while ((pos = buff.find("\r\n")) != buff.npos)
+	{
 		std::string line = buff.substr(0, pos);
 		buff.erase(0, pos + 2);
 		this->callcmd(line, *c);

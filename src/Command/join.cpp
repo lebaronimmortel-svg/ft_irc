@@ -42,18 +42,14 @@ void Server::join(std::string &str, size_t &i, Client &c)
 
 		if (!chan)
 		{
-			
 			std::string name = this->getArgsparse(cmd_sfx_ref(str), ',').at(i);
 			if (name.empty() || name[0] != '#')
 				continue ;
 			Channel *nchan = new Channel(name);
 			this->addChannel(nchan);
 			nchan->addUser(&c);
-
 			print_new_channel(c, nchan);
-
 			this->reply(&c, RPL_WELCOME, ": welcome on channel: " + name);
-			
 		}
 
 		else if (chan->getMember(c.getNickName()) != NULL)
@@ -86,9 +82,7 @@ void Server::join(std::string &str, size_t &i, Client &c)
 			}
 			chan->addUser(&c);
 			chan->delInvited(&c);
-
 			print_join_channel(c, chan);
-
 			this->reply(&c, RPL_WELCOME, ": welcome on channel " + chan->getName());
 		}
 	}

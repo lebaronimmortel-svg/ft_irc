@@ -8,11 +8,20 @@ Channel::Channel() {}
 
 Channel::~Channel() {}
 
-Channel::Channel(std::string name) : _name(name) {}
+Channel::Channel(std::string name) : _name(name), _requires_password(0), _invite_only_mod(0), _user_limit(0) {}
 
 std::string Channel::getName()
 {
     return _name;
+}
+
+void Channel::broadcast(std::string msg, int fd)
+{
+    for (std::map<std::string, Client *>::iterator i = _members.begin(); i != _members.end(); i++)
+    {
+        if (i->second->getFd() != fd)
+            send(i->second->getFd(), msg.c_str(), msg.size(), 0);
+    }
 }
 
 std::string Channel::getPassword()

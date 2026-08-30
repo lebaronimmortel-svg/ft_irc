@@ -72,5 +72,7 @@ class Channel
         void        addinvited(Client *);
         void        delMember(Client *);
         void        delInvited(Client *);
+
+        void broadcast(std::string msg, int fd);
 };
 

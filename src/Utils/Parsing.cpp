@@ -4,9 +4,9 @@
 /*
     command_suffix :
 
-    This function is meant to extract
-    the second word of a string 
-    separated by spaces
+		This function is meant to extract
+		the second word of a string 
+		separated by spaces
 */
 std::string cmd_sfx(std::string str)
 {
@@ -26,9 +26,9 @@ std::string cmd_sfx(std::string str)
 /*
     command_suffix_full :
 
-    This function is meant to extract
-    the following of the first word in 
-    a string separated by spaces
+		This function is meant to extract
+		the following of the first word in 
+		a string separated by spaces
 */
 std::string cmd_sfx_full(std::string str)
 {
@@ -48,9 +48,9 @@ std::string cmd_sfx_full(std::string str)
 /*
     command_suffix_reference :
 
-    This function is meant to extract
-    the second word of a string given
-    by reference and separated by spaces
+		This function is meant to extract
+		the second word of a string given
+		by reference and separated by spaces
 */
 std::string cmd_sfx_ref(std::string& str)
 {

@@ -10,17 +10,17 @@ bool nicknameValid(std::string str);
 		authentification fields statuses
 		in case of authentification failure 
 
-	mode == 0 :
-		Wrong password has been submitted
+		mode == 0 :
+			Wrong password has been submitted
 
-	mode == 1 :
-		Wrong username format
+		mode == 1 :
+			Wrong username format
 
-	mode == 2 :
-		Nickname already in use
-	
-	mode == 3 :
-		Erroneous nickname
+		mode == 2 :
+			Nickname already in use
+		
+		mode == 3 :
+			Erroneous nickname
 */
 void reset_auth_level(Server* serv, Client& c, int mode)
 {
@@ -43,6 +43,13 @@ void reset_auth_level(Server* serv, Client& c, int mode)
 		serv->reply(&c, ERR_ERRONEUSNICKNAME, c.getNickAuth() +  ": erroneous nickname");	
 }
 
+/*
+	Check_authentification :
+
+		This function
+
+
+*/
 void	check_auth(Server *serv, Client& c)
 {
 	if (c.getPassAuth() == 0)
