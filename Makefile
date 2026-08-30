@@ -34,6 +34,7 @@ OBJ_DIR = ./obj/$(DIR)
 Channel = Channel.cpp
 Client = Client.cpp
 Server = Server.cpp
+Utils = Print.cpp Parsing.cpp
 Command =	invite.cpp \
 			join.cpp \
 			kick.cpp \
@@ -45,12 +46,12 @@ Command =	invite.cpp \
 			user.cpp \
 
 
-SUB_DIR = Channel Client Server Command
+SUB_DIR = Channel Client Server Command Utils
 
 VPATH := $(DIR) \
 	$(addprefix $(DIR)/, $(SUB_DIR))
 
-SRCS = main.cpp $(Command) $(Channel) $(Client) $(Server)
+SRCS = main.cpp $(Command) $(Channel) $(Client) $(Server) $(Utils)
 
 # --- LOGIC ---
 

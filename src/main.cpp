@@ -2,20 +2,10 @@
 #include "../includes/Client.hpp"
 #include <iostream>
 
-std::string cmd_sfx(std::string str)
-{
-	unsigned long i = 0;
-	unsigned long len = str.size();
-	std::string res = "";
-	while (i < len && str[i] != ' ')
-		i++;
-	if (i == len)
-		return res;
-	i++;
-	while (i < len && str[i] != ' ')
-			res += str[i++];
-	return res;
-}
+void print_header();
+void print_client_quit(std::string user, std::string nick, int fd);
+void print_new_connection(int client_fd);
+std::string cmd_sfx(std::string str);
 
 int main(int argc, char** argv)
 {
@@ -33,6 +23,8 @@ int main(int argc, char** argv)
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
 	}
+
+	print_header();
 
 	Server serv(port, argv[2]);
 	int server_socket = serv.getSocket();
@@ -55,10 +47,7 @@ int main(int argc, char** argv)
 				if (client_fd == -1)
 					continue;
 
-				std::cout << std::endl << BLUE << "╔═════════════════════════╗" << RESET << std::endl;
-				std::cout << BLUE << "║ New connection received ║" << std::endl;
-				std::cout << BLUE << "╚═════════════════════════╝" << RESET << std::endl;
-				std::cout << BLUE << "fil_desc: " << RESET << client_fd << std::endl << std::endl;
+				print_new_connection(client_fd);
 
 				struct epoll_event client_event = 
 				{
@@ -90,12 +79,9 @@ int main(int argc, char** argv)
 					close(fd);
 					serv.removeClient(fd);
 					client->leaveAllChannels();
-					std::cout << std::endl << BLUE << "╔════════════════════╗" << RESET << std::endl;
-					std::cout << BLUE << "║ Client quit server ║" << std::endl;
-					std::cout << BLUE << "╚════════════════════╝" << RESET << std::endl;
-					std::cout << BLUE << "username: " << RESET << user << std::endl;
-					std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
-					std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;
+					
+					print_client_quit(user, nick, fd);
+
 					serv.clean(); // removes empty_channels
 					continue ;
 				}
@@ -117,12 +103,7 @@ int main(int argc, char** argv)
 				epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
 				close(fd);
 				client->leaveAllChannels();
-				std::cout << std::endl << BLUE << "╔════════════════════╗" << RESET << std::endl;
-				std::cout << BLUE << "║ Client quit server ║" << std::endl;
-				std::cout << BLUE << "╚════════════════════╝" << RESET << std::endl;
-				std::cout << BLUE << "username: " << RESET << user << std::endl;
-				std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
-				std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;
+				print_client_quit(user, nick, fd);
 				serv.removeClient(fd);
 				serv.clean(); // removes empty_channels
 			}

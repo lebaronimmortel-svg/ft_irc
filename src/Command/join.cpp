@@ -14,8 +14,11 @@
 #include "../../includes/Client.hpp"
 
 std::string cmd_sfx_ref(std::string& str);
+void print_new_channel(Client& c, Channel* nchan);
+void print_join_channel(Client& c, Channel* chan);
 
-void Server::join(std::string &str, size_t &i, Client &c){
+void Server::join(std::string &str, size_t &i, Client &c)
+{
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
@@ -47,16 +50,13 @@ void Server::join(std::string &str, size_t &i, Client &c){
 			this->addChannel(nchan);
 			nchan->addUser(&c);
 
-			std::cout << std::endl << BLUE << "╔════════════════════════════╗" << RESET << std::endl;
-			std::cout << BLUE << "║ Client created new channel ║" << std::endl;
-			std::cout << BLUE << "╚════════════════════════════╝" << RESET << std::endl;
-			std::cout << BLUE << "nickname: " << RESET << c.getNickName() << std::endl;
-			std::cout << BLUE << "created: " << RESET << nchan->getName() << std::endl << std::endl;
+			print_new_channel(c, nchan);
+
 			this->reply(&c, RPL_WELCOME, ": welcome on channel: " + name);
 			
 		}
 
-		else if (chan->getMember(c.getUserName()) != NULL)
+		else if (chan->getMember(c.getNickName()) != NULL)
 			this->reply(&c, ERR_USERONCHANNEL, chan->getName() +  ": already on channel");
 
 		else
@@ -87,12 +87,7 @@ void Server::join(std::string &str, size_t &i, Client &c){
 			chan->addUser(&c);
 			chan->delInvited(&c);
 
-			std::cout << std::endl << BLUE << "╔═══════════════════════════╗" << RESET << std::endl;
-			std::cout << BLUE << "║ Client joined new channel ║" << std::endl;
-			std::cout << BLUE << "╚═══════════════════════════╝" << RESET << std::endl;
-			std::cout << BLUE << "nickname: " << RESET << c.getNickName() << std::endl;
-			std::cout << BLUE << "joined: " << RESET << chan->getName() << std::endl << std::endl;
-
+			print_join_channel(c, chan);
 
 			this->reply(&c, RPL_WELCOME, ": welcome on channel " + chan->getName());
 		}

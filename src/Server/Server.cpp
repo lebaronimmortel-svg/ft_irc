@@ -15,6 +15,8 @@
 #include "../../includes/Client.hpp"
 #include <cstring>
 
+std::string cmd_sfx_ref(std::string& str);
+
 const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
 	/* RPL_WELCOME */ "001",
 	/*RPL_WELCOME*/"001",
@@ -177,10 +179,6 @@ void Server::addClient(int client_fd)
 
 void	Server::removeClient(int fd)
 {
-	/*
-	pour tous les channels ou le client est present, l'effacer (chan.delMember(nickname))
-	*/
-
 	_clients.erase(fd);
 }
 
@@ -268,21 +266,6 @@ Channel *Server::getChannelparse(std::string &str, size_t &i){
 	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
 }
 
-std::string cmd_sfx_ref(std::string& str)
-{
-	unsigned long i = 0;
-	unsigned long len = str.size();
-	std::string res = "";
-	while (i < len && str[i] != ' ')
-		i++;
-	if (i == len)
-		return res;
-	i++;
-	while (i < len)
-			res += str[i++];
-	return res;
-}
-
 std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, size_t &i)
 {
     (void) i;
@@ -315,6 +298,14 @@ std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str,
     return chanvec;
 }
 
+static void print_channel_deleted(std::map<std::string, Channel*>::iterator it)
+{
+	std::cout << std::endl << BLUE << "╔═════════════════╗" << RESET << std::endl;
+	std::cout << BLUE << "║ Channel deleted ║" << std::endl;
+	std::cout << BLUE << "╚═════════════════╝" << RESET << std::endl;
+	std::cout << BLUE << "channel: " << RESET << it->first << std::endl << std::endl;	
+}
+
 void Server::clean()
 {
     std::map<std::string, Channel*>::iterator it = _channels.begin();
@@ -322,20 +313,13 @@ void Server::clean()
     while (it != _channels.end())
     {
         Channel *chan = it->second;
-
         if (chan != NULL && chan->getMembers().empty())
         {
-            std::cout << std::endl << BLUE << "╔═════════════════╗" << RESET << std::endl;
-            std::cout << BLUE << "║ Channel deleted ║" << std::endl;
-            std::cout << BLUE << "╚═════════════════╝" << RESET << std::endl;
-            std::cout << BLUE << "channel: " << RESET << it->first << std::endl << std::endl;
-
+			print_channel_deleted(it);
             _channels.erase(it++);
         }
         else
-        {
             ++it;
-        }
     }
 }
 

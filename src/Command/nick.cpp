@@ -14,6 +14,7 @@
 #include "../../includes/Client.hpp"
 
 std::string cmd_sfx(std::string str);
+void reset_auth_level(Server* serv, Client& c, int mode);
 
 bool nicknameValid(std::string str){
 	size_t length = str.length();
@@ -42,14 +43,8 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 		return ;
 	}
 	std::string name = cmd_sfx(str);
-	if (!nicknameValid(name)){
-		this->reply(&c, ERR_ERRONEUSNICKNAME, name +  ": erroneous nickname");
-		return ;
-	};
-	if (this->get_client(name, 0, 2) != NULL){
-		this->reply(&c, ERR_NICKNAMEINUSE, name +  ": nickname already in use");
-		return ;
-	}
+	if (nicknameValid(name) && this->get_client(name, 0, 2) == NULL)
+		c.setNickAuthString(1);
 	c.setNickAuth(name);
 	if (c.getAuthenticated())
 		return ;
@@ -59,24 +54,20 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 	{
 		if (c.getPassAuth() == 0)
 		{
-			this->reply(&c, ERR_PASSWDMISMATCH, "IRCServer: wrong password");
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << USERNAME));
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << NICKNAME));
-			c.setUserAuth("");
-			c.setNickAuth("");
-			c.setUserAuthString(0);
+			reset_auth_level(this, c, 0);
 			return ;
 		}
 		else if (c.getUserAuthString() == 0)
 		{
-			this->reply(&c, ERR_NEEDMOREPARAMS, c.getUserAuth() +  ": username requires 4 parameters");
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << USERNAME));
-			c.setAuthLevel(c.getAuthLevel() & ~(1 << NICKNAME));
-			c.setNickAuth("");
-			c.setUserAuth("");
-			c.setPassAuth(0);
+			reset_auth_level(this, c, 1);
+			return ;
+		}
+		else if (c.getNickAuthString() == 0)
+		{
+			if (!nicknameValid(name))
+				reset_auth_level(this, c, 3);
+			else if (this->get_client(name, 0, 2) != NULL)
+				reset_auth_level(this, c, 2);
 			return ;
 		}
 		else

@@ -160,17 +160,22 @@ void Channel::addinvited(Client  *c){
     this->_invited[c->getNickName()] = c;
 }
 
+static void print_del_member(std::string name, std::string nick)
+{
+    std::cout << std::endl << BLUE << "╔═════════════════════╗" << RESET << std::endl;
+    std::cout << BLUE << "║ Client quit channel ║" << std::endl;
+    std::cout << BLUE << "╚═════════════════════╝" << RESET << std::endl;
+    std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
+    std::cout << BLUE << "quit: " << RESET << name << std::endl << std::endl;
+}
+
 void Channel::delMember(Client *c)
 {
     try 
     {
         this->_members.at(c->getNickName());
         this->_members.erase(c->getNickName());
-        std::cout << std::endl << BLUE << "╔═════════════════════╗" << RESET << std::endl;
-        std::cout << BLUE << "║ Client quit channel ║" << std::endl;
-        std::cout << BLUE << "╚═════════════════════╝" << RESET << std::endl;
-        std::cout << BLUE << "nickname: " << RESET << c->getNickName() << std::endl;
-        std::cout << BLUE << "quit: " << RESET << _name << std::endl << std::endl;
+        print_del_member(_name, c->getNickName());
     } 
     catch (std::exception &e)
     {

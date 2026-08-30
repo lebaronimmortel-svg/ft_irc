@@ -31,6 +31,7 @@ class Client
         // where to read/write
         int _fd;
         int _user_auth_string;
+        int _nick_auth_string;
 
         // stores current command
         std::string _buffer;
@@ -57,6 +58,7 @@ class Client
         const std::map<std::string, Channel*>& getChannels() const { return _channels; }
         int getPassAuth() { return _pass_auth; }
         int getUserAuthString() { return _user_auth_string; }
+        int getNickAuthString() { return _nick_auth_string; }
 
         std::string    getUserAuth() { return _user_auth; }
         std::string    getNickAuth() { return _nick_auth; }
@@ -71,6 +73,7 @@ class Client
         void        setBuffer(std::string);
         void        setPassAuth(int i) { _pass_auth = i; }
         void        setUserAuthString(int i) { _user_auth_string = i; }
+        void        setNickAuthString(int i) { _nick_auth_string = i; }
 
         //int     is_chan_member();
         void    addChannel(Channel* channel);

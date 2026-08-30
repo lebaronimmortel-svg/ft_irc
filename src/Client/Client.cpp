@@ -7,7 +7,7 @@ Client::Client() {}
 Client::~Client() {}
 
 Client::Client(int fd) : 
-_nickname(""), _username(""), _fullname(""), _user_auth(""), _nick_auth(""), _authenticated(0), _fd(fd), _user_auth_string(0), _pass_auth(0), authLevel(0)
+_nickname(""), _username(""), _fullname(""), _user_auth(""), _nick_auth(""), _authenticated(0), _fd(fd), _user_auth_string(0), _nick_auth_string(0), _pass_auth(0), authLevel(0)
 {}
 
 std::string Client::getNickName()
@@ -57,18 +57,20 @@ void Client::setUserName(std::string username)
     _username = username;
 }
 
+static void print_auth(std::string username, std::string nickname, int fd)
+{
+    std::cout << std::endl << BLUE << "╔══════════════════════════╗" << RESET << std::endl;
+    std::cout << BLUE << "║ New client joined server ║" << std::endl;
+    std::cout << BLUE << "╚══════════════════════════╝" << RESET << std::endl;
+    std ::cout << BLUE << "username: " << RESET << username << std::endl << BLUE << "nickname: " << RESET << nickname << std::endl;
+    std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;    
+}
+
 void Client::setAuthenticated(bool authenticated)
 {
     _authenticated = authenticated;
     if (authenticated == true)
-    {
-        std::cout << std::endl << BLUE << "╔══════════════════════════╗" << RESET << std::endl;
-        std::cout << BLUE << "║ New client joined server ║" << std::endl;
-        std::cout << BLUE << "╚══════════════════════════╝" << RESET << std::endl;
-        std ::cout << BLUE << "username: " << RESET << _username << std::endl << BLUE << "nickname: " << RESET << _nickname << std::endl;
-        std::cout << BLUE << "fil_desc: " << RESET << _fd << std::endl << std::endl;
-    }
-
+        print_auth(_username, _nickname, _fd);
 }
 
 void   Client::setAuthLevel(size_t level)
