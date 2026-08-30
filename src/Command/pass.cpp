@@ -23,17 +23,41 @@ void Server::pass(std::string &str, size_t &i, Client &c)
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: user already registered");
 		return ;
 	}
-	if (cmd_sfx(str) != _password)
-	{
-		this->reply(&c, ERR_PASSWDMISMATCH, "IRCServer: wrong password");
-		c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
-		return ;
-	}
+	if (cmd_sfx(str) == _password)
+		c.setPassAuth(1);
 	c.setAuthLevel(c.getAuthLevel() | (1 << PASSWORD));
 
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthLevel() & reqperm) == reqperm){
-		this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
-		c.setAuthenticated(true);
+	if ((c.getAuthLevel() & reqperm) == reqperm)
+	{
+		if (c.getPassAuth() == 0)
+		{
+			this->reply(&c, ERR_PASSWDMISMATCH, "IRCServer: wrong password");
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << USERNAME));
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << NICKNAME));
+			c.setUserAuth("");
+			c.setNickAuth("");
+			c.setUserAuthString(0);
+			return ;
+		}
+		else if (c.getUserAuthString() == 0)
+		{
+			this->reply(&c, ERR_NEEDMOREPARAMS, c.getUserAuth() +  ": username requires 4 parameters");
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << USERNAME));
+			c.setAuthLevel(c.getAuthLevel() & ~(1 << NICKNAME));
+			c.setNickAuth("");
+			c.setUserAuth("");
+			c.setPassAuth(0);
+			return ;
+		}
+		else
+		{
+			this->reply(&c, RPL_WELCOME, ": welcome on server: IRCserver");
+			c.setNickName(c.getNickAuth());
+			c.setUserName(c.getUserAuth());
+			c.setAuthenticated(true);
+		}
 	} 
 }

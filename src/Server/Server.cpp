@@ -227,7 +227,8 @@ int Server::callcmd(std::string str, Client &c){
 	cmdfunc func = this->getcmd(str);
 	if (!func)
 	{
-		this->reply(&c, ERR_UNKNOWNCOMMAND, "unknown command");
+		if (c.getAuthenticated() == 1)
+			this->reply(&c, ERR_UNKNOWNCOMMAND, "unknown command");
 		return 0;
 	}
 	size_t i = str.find(' ');
