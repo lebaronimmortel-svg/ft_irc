@@ -51,6 +51,7 @@ class Channel
         std::string  getTopicLastModifDate();
         std::string  getTopicLastModifierUsername();
         unsigned int getUserLimit();
+        std::string  getModesString();
 
         // setters
         void         setName(std::string name);

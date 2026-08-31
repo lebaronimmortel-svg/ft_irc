@@ -57,7 +57,6 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		}
 		return ;
 	}
-	
 
 	/*
 		Permissions check

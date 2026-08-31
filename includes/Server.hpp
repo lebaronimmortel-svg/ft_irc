@@ -67,7 +67,7 @@ class Server
         std::vector<std::string> getArgsparse(std::string str, char sep);
         Channel *getChannelparse(std::string &str, size_t i);
         std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, size_t &i);
-        mode_s *getflagmode(Channel *, Client *c, std::string str);
+        mode_s *getflagmode(Channel *, Client *c, const std::string& str);
 
     public :
 

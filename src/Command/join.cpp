@@ -40,9 +40,8 @@ void Server::join(std::string &str, size_t &i, Client &c)
 		return;
 	}
 	std::vector<Channel *> *channels = this->getChannelListparse(&c, str, i);
-	if (channels == NULL){
+	if (channels == NULL)
 		return ;
-	}
 
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
 

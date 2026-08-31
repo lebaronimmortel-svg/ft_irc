@@ -14,7 +14,8 @@
 #include "../../includes/Client.hpp"
 
 
-void Server::invite(std::string &str, size_t &i, Client &c){
+void Server::invite(std::string &str, size_t &i, Client &c)
+{
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
@@ -22,7 +23,8 @@ void Server::invite(std::string &str, size_t &i, Client &c){
 	}
 	int cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
-	if (chan == NULL){
+	if (chan == NULL)
+	{
 		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) + ": this channel doesn't exist");
 		return ;
 	}
@@ -35,13 +37,12 @@ void Server::invite(std::string &str, size_t &i, Client &c){
 	if (arg.size() == 0)
 		return;
 	size_t lenght = arg.size();
-	for (size_t i = 0; i < lenght; i++){
+	for (size_t i = 0; i < lenght; i++)
+	{
 		Client *user = chan->getMember(arg.at(i));
-		if (user == NULL){
+		if (user == NULL)
 			this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
-		}
-		else {
+		else
 			chan->addinvited(user);
-		}
 	}
 }

@@ -266,7 +266,6 @@ Channel *Server::getChannelparse(std::string &str, size_t i)
     std::string sub = str.substr(i, end - i);
     i = end;
 
-
     std::map<std::string, Channel *> &lst = this->getChannelList();
     std::map<std::string, Channel *>::iterator it = lst.find(sub);
 
