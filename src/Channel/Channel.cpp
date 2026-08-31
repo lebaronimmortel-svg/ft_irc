@@ -31,33 +31,39 @@ std::string Channel::getPassword()
 
 Client* Channel::getMember(std::string username)
 {
-     try {
+    try 
+    {
         Client *user = _members.at(username);
         return (user);
     }
-    catch (std::exception &e){
+    catch (std::exception &e)
+    {
         return (NULL);
     }
 }
 
-std::map<std::string, Client*> Channel::getMembers(){
+std::map<std::string, Client*> Channel::getMembers()
+{
     return this->_members;
 }
 
 Client* Channel::getModerator(std::string username)
 {
-    try {
+    try 
+    {
         Client *user = _moderators.at(username);
         return (user);
     }
-    catch (std::exception &e){
+    catch (std::exception &e)
+    {
         return (NULL);
     }
 }
 
 Client* Channel::getInvited(std::string username)
 {
-    try {
+    try 
+    {
         Client *user = _invited.at(username);
         return (user);
     }
@@ -152,12 +158,15 @@ void Channel::addUser(Client *client)
     _members.insert(std::make_pair(client->getNickName(), client));
     client->addChannel(this);
 } 
-void Channel::addModerator(Client *c){
+void Channel::addModerator(Client *c)
+{
     this->_moderators[c->getNickName()] = c; 
 }
 
-void Channel::delModerator(Client *c){
-    try {
+void Channel::delModerator(Client *c)
+{
+    try 
+    {
         this->_moderators.at(c->getNickName());
         this->_moderators.erase(c->getNickName());
     } catch (std::exception &e){
@@ -165,7 +174,8 @@ void Channel::delModerator(Client *c){
     }
 }
 
-void Channel::addinvited(Client  *c){
+void Channel::addinvited(Client  *c)
+{
     this->_invited[c->getNickName()] = c;
 }
 

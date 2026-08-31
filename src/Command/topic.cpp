@@ -21,7 +21,7 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
-	int cpy = i;
+	size_t cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
 	if (chan == NULL)
 	{
@@ -47,17 +47,37 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 	{
 		if (chan->getModerator(c.getNickName()) == NULL)
 		{
-			this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": require to be operator");
+			this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": requires to be operator");
 			return ;
 		}
 	}
-	chan->setTopic(arg[0]);
+
+	/*
+		Parsing new
+		topic message
+	*/
+	std::string topic;
+	if (arg.size() >= 2)
+	{
+		if (arg.at(2)[0] == ':')
+		{
+			topic = arg.at(2).substr(1);
+			for (size_t j = 3; j < arg.size(); j++)
+				topic += " " + arg.at(j);
+		}
+		else 
+		{
+			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": no message provided");
+			return ;	
+		}
+	}
+
+	chan->setTopic(topic);
 	chan->setTopicLastModifierUsername(c.getNickName());
 	std::ostringstream oss;
 	oss << std::time(NULL);
 	chan->setTopicLastModifDate(oss.str());
-
 	std::string msg = ":" + c.getNickName() + "!" + c.getUserName() +
-						  "@localhost TOPIC " + chan->getName() + " :" + arg[0] + "\r\n";
-	this->replyChannel(chan, msg);
+						  "@localhost TOPIC " + chan->getName() + " :" + topic + "\r\n";
+	chan->broadcast(msg, -1);
 }
