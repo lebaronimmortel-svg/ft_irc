@@ -111,6 +111,8 @@ class Server
         void privmsg(std::string &str, size_t &i, Client &);
         Channel *get_channel(std::string name);
 
+        int	kick_lexer(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy);
+
         // setters
         void addChannel(Channel *channel, std::string name);
 

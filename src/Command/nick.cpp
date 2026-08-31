@@ -13,31 +13,30 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+// parsing
 std::string cmd_sfx(std::string str);
+bool nicknameValid(std::string str);
+
+// authentification
 void reset_auth_level(Server* serv, Client& c, int mode);
 void check_auth(Server *serv, Client& c);
 
-bool nicknameValid(std::string str){
-	size_t length = str.length();
-	if (length == 0 || length > 9)
-		return false;
-	std::string spec("[]\\`_^{|}");
-	for (size_t i = 0; i < length; i++){
-		if (i == 0){
-			if (!isalpha(str[i]) && spec.find(str[i]) == spec.npos)
-				return false;
-		}
-		else{
-			if (!isalnum(str[i]) && spec.find(str[i]) == spec.npos && str[i] != '-')
-				return false;
-		}
-	}
-	return (true);
-}
+/*
+	nickname
 
+		This function is meant to
+		execute the NICK command 
+		from an IRC client:
+
+		NICK nickname
+*/
 void Server::nick(std::string &str, size_t &i, Client &c)
 {
 	(void) i;
+
+	/*
+		Parsing the provided input
+	*/
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	std::string name = cmd_sfx(str);
 	if (nicknameValid(name) && this->get_client(name, 0, 0) == NULL)
@@ -50,19 +49,35 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 		else
 			c.setNickAuthString(1);
 	}
+
+	/*
+		case 1 :
+
+			Client is already
+			registered in the 
+			server
+	*/
 	if (c.getAuthenticated())
 	{
 		if (this->get_client(name, 0, 0) != NULL)
 			this->reply(&c, ERR_NICKNAMEINUSE, name +  ": nickname already in use");
 		else if (!nicknameValid(name))
 			this->reply(&c, ERR_ERRONEUSNICKNAME, name +  ": erroneous nickname");
-		return ;
 	}
-	c.setNickAuth(name);
-	c.setAuthLevel(c.getAuthLevel() | (1 << NICKNAME));
-	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthLevel() & reqperm) == reqperm)
+
+	/*
+		case 2 :
+
+			Client isn't
+			registered in 
+			the server yet
+	*/
+	else
 	{
-		check_auth(this, c);
+		c.setNickAuth(name);
+		c.setAuthLevel(c.getAuthLevel() | (1 << NICKNAME));
+		size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
+		if ((c.getAuthLevel() & reqperm) == reqperm)
+			check_auth(this, c);
 	}
 }

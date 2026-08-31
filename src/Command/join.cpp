@@ -13,12 +13,27 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+// parsing
 std::string cmd_sfx_ref(std::string& str);
+
+// print
 void print_new_channel(Client& c, Channel* nchan);
 void print_join_channel(Client& c, Channel* chan);
 
+/*
+	join
+
+		This function is meant to
+		execute the JOIN command from
+		an IRC client:
+
+		JOIN #channel1,#channel2,#channel3
+*/
 void Server::join(std::string &str, size_t &i, Client &c)
 {
+	/*
+		Lexing provided input
+	*/
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
@@ -31,15 +46,21 @@ void Server::join(std::string &str, size_t &i, Client &c)
 
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
 
-
 	int lenght = channels->size();
 	int lenght_args = args.size();
 
-	
+	/*
+		Browsing channels 
+		list names
+	*/
 	for (int i = 0; i < lenght; i++)
 	{
 		Channel *chan = channels->operator[](i);
 
+		/*
+			case 1 : submitted channel
+			doesn't already exist
+		*/
 		if (!chan)
 		{
 			std::string name = this->getArgsparse(cmd_sfx_ref(str), ',').at(i);
@@ -50,33 +71,51 @@ void Server::join(std::string &str, size_t &i, Client &c)
 			nchan->addUser(&c);
 			nchan->addModerator(&c);
 			print_new_channel(c, nchan);
+			nchan->broadcast(c.getNickName() + " has joined channel " + name + "\r\n", c.getFd());
 			this->reply(&c, RPL_WELCOME, ": welcome on channel: " + name);
 		}
 
+		/*
+			case 2 : submitted channel
+			already exists and client
+			is already member
+		*/
 		else if (chan->getMember(c.getNickName()) != NULL)
 			this->reply(&c, ERR_USERONCHANNEL, chan->getName() +  ": already on channel");
 
+		/*
+			case 3 : submitted channel
+			already exists and client
+			isn't member yet
+		*/
 		else
 		{
-			if (chan->getInviteOnlyStatus()){
+			if (chan->getInviteOnlyStatus())
+			{
 				if (chan->getInvited(c.getNickName()) == NULL)
 				{
 					this->reply(&c, ERR_INVITEONLYCHAN, chan->getName() + ": cannot join channel (+i)");
 					continue;
 				}	
 			}
-			if (chan->getUserLimit() != 0 && chan->getMembers().size() >= chan->getUserLimit()){
+			if (chan->getUserLimit() != 0 && chan->getMembers().size() >= chan->getUserLimit())
+			{
 				this->reply(&c, ERR_CHANNELISFULL, chan->getName() + ": cannot join channel (+l)");
 				continue;
 			}
-			if (chan->getPasswordRequirement()){
-				if (i < lenght_args){
+			if (chan->getPasswordRequirement())
+			{
+				if (i < lenght_args)
+				{
 					std::string key = args[i];
-					if (chan->getPassword() != key){
+					if (chan->getPassword() != key)
+					{
 						this->reply(&c, ERR_PASSWDMISMATCH, chan->getName() + ": cannot join channel (+k)");
 						continue;
 					}
-				} else { 
+				} 
+				else 
+				{ 
 					this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() + ": cannot join channel (+k)");
 					continue;
 				}
@@ -84,6 +123,7 @@ void Server::join(std::string &str, size_t &i, Client &c)
 			chan->addUser(&c);
 			chan->delInvited(&c);
 			print_join_channel(c, chan);
+			chan->broadcast(c.getNickName() + " has joined channel " + chan->getName() + "\r\n", c.getFd());
 			this->reply(&c, RPL_WELCOME, ": welcome on channel " + chan->getName());
 		}
 	}

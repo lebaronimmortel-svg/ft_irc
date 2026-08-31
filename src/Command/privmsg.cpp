@@ -14,6 +14,15 @@
 #include "../../includes/Client.hpp"
 #include <cstring>
 
+/*
+    private message
+
+        this function is meant to
+        execute the PRIVMSG
+        command from an IRC client:
+
+        PRIVMSG #channel1,user1,#channel2,user2,user3,#channel3 :message
+*/
 void Server::privmsg(std::string &str, size_t &i, Client &c)
 {
     if (!c.getAuthenticated())
@@ -21,6 +30,11 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         this->reply(&c, ERR_NOTREGISTERED, ":You have not registered");
         return;
     }
+
+    /*
+        Parsing provided input to 
+        reach targets
+    */
     size_t length = str.length();
     while (i < length && (str[i] == ' ' || str[i] == '\r' || str[i] == '\n'))
         i++;
@@ -29,10 +43,19 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         this->reply(&c, ERR_NORECIPIENT, ":No recipient given (PRIVMSG)");
         return;
     }
+
+    /*
+        Storing targets list
+    */
     size_t target_start = i;
     while (i < length && strchr("\r\n :", str[i]) == NULL)
         i++;
     std::string raw_targets = str.substr(target_start, i - target_start);
+
+    /*
+        Parsing provided input to 
+        reach message
+    */
     while (i < length && str[i] == ' ')
         i++;
     if (i >= length)
@@ -42,6 +65,10 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
     }
     if (str[i] == ':')
         i++;
+   
+    /*
+        Storing message
+    */
     std::string mess = str.substr(i);
     size_t end = mess.find_last_not_of("\r\n");
     if (end != std::string::npos)
@@ -53,13 +80,27 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         this->reply(&c, ERR_NOTEXTTOSEND, ":No text to send");
         return;
     }
+
+    /*
+        Splitting the target list
+        into a list of targets
+    */
     std::vector<std::string> targets = getArgsparse(raw_targets, ',');
+
+    /*
+        Browsing the targets list
+    */
     for (size_t y = 0; y < targets.size(); y++)
     {
         std::string name = targets[y];
         if (name.empty())
             continue;
 
+        /*
+            case 1 :
+
+                target is a channel
+        */
         if (name[0] == '#')
         {
             std::map<std::string, Channel *>::iterator it = this->getChannelList().find(name);
@@ -78,6 +119,12 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
                               "@localhost PRIVMSG " + chan->getName() + " :" + mess + "\r\n";
             chan->broadcast(msg, c.getFd());
         }
+
+        /*
+            case 2 :
+
+                target is a client
+        */
         else 
         {
             Client *dest = this->get_client(name, 0, 0);

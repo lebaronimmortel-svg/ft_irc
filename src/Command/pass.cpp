@@ -13,26 +13,36 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+// parsing
 std::string cmd_sfx(std::string str);
-void reset_auth_level(Server* serv, Client& c, int mode);
-bool nicknameValid(std::string str);
-void check_auth(Server *serv, Client& c);
 
+// authentification
+void check_auth(Server *serv, Client& c);
+void reset_auth_level(Server* serv, Client& c, int mode);
+
+/*
+	password
+
+		This function is meant to execute
+		the PASS command from an IRC client:
+
+		PASS password
+*/
 void Server::pass(std::string &str, size_t &i, Client &c)
 {	
 	(void) i;
 
-	if (c.getAuthenticated()){
+	if (c.getAuthenticated())
+	{
 		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: user already registered");
 		return ;
 	}
+
 	if (cmd_sfx(str) == _password)
 		c.setPassAuth(1);
 	c.setAuthLevel(c.getAuthLevel() | (1 << PASSWORD));
 
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm)
-	{
 		check_auth(this, c);
-	}
 }

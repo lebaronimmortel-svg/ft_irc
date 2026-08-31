@@ -66,3 +66,22 @@ std::string cmd_sfx_ref(std::string& str)
 			res += str[i++];
 	return res;
 }
+
+bool nicknameValid(std::string str)
+{
+	size_t length = str.length();
+	if (length == 0 || length > 9)
+		return false;
+	std::string spec("[]\\`_^{|}");
+	for (size_t i = 0; i < length; i++){
+		if (i == 0){
+			if (!isalpha(str[i]) && spec.find(str[i]) == spec.npos)
+				return false;
+		}
+		else{
+			if (!isalnum(str[i]) && spec.find(str[i]) == spec.npos && str[i] != '-')
+				return false;
+		}
+	}
+	return (true);
+}
