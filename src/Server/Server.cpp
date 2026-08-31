@@ -165,8 +165,9 @@ Client* Server::get_client(std::string nickname, int fd, int mode)
 			return (i->second);
 		if (mode == 1 && i->first == fd)
 			return (i->second);
+		if (mode == 2 && (i->second->getNickName() == nickname))
+			return (i->second);
 	}
-
 	return (NULL);
 }
 
@@ -305,6 +306,19 @@ std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str,
     }
 
     return chanvec;
+}
+
+Channel* Server::get_channel(std::string name)
+{
+    try 
+    {
+        Channel* chan = _channels.at(name);
+        return (chan);
+    }
+    catch (std::exception &e)
+    {
+        return (NULL);
+    }
 }
 
 void Server::clean()

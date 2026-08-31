@@ -21,8 +21,13 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
-	int cpy = i;
-	Channel *chan = this->getChannelparse(str, i);
+
+	std::vector<std::string> arg = this->getArgsparse(str, ' ');
+	if (arg.size() == 0)
+		return;
+	size_t cpy = i;
+
+	Channel *chan = this->get_channel(arg.at(1));
 	if (chan == NULL)
 	{
 		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) + ": this channel doesn't exist");
@@ -33,16 +38,15 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": require to be operator");
 		return ;
 	}
-	std::vector<std::string> arg = this->getArgsparse(str, ' ');
-	if (arg.size() == 0)
-		return;
-	size_t lenght = arg.size();
-	for (size_t i = 0; i < lenght; i++)
+
+	Client *user = this->get_client(arg.at(2), 0, 2);
+	if (user == NULL)
+		this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
+	else
 	{
-		Client *user = chan->getMember(arg.at(i));
-		if (user == NULL)
-			this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
-		else
-			chan->addinvited(user);
+		chan->addinvited(user);
+		std::string msg = "You have been invited by " + c.getNickName() + " to join channel " + chan->getName() + "\r\n"; 
+		send(user->getFd(), msg.c_str(), msg.size(), 0);
 	}
+
 }
