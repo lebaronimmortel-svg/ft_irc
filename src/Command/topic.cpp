@@ -14,6 +14,15 @@
 #include "../../includes/Client.hpp"
 #include <ctime>
 
+/*
+	topic
+
+		This function is meant to
+		execute the TOPIC command
+		from an IRC client:
+
+		TOPIC #channel :message
+*/
 void Server::topic(std::string &str, size_t &i, Client &c)
 {
 	if (!c.getAuthenticated())
@@ -21,16 +30,22 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
+
+	/*
+		Parsing 
+		the input
+	*/
 	size_t cpy = i;
 	Channel *chan = this->getChannelparse(str, i);
+
 	if (chan == NULL)
 	{
 		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) +  ": this channel doesn't exist");
 		return ;
 	}
-	
+
 	std::vector<std::string> arg = this->getArgsparse(str, ' ');
-	
+
 	if (arg.size() == 0)
 	{
 		if (chan->getTopic().empty())
@@ -43,6 +58,10 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		return ;
 	}
 	
+
+	/*
+		Permissions check
+	*/
 	if (chan->getTopicRestrictionStatus())
 	{
 		if (chan->getModerator(c.getNickName()) == NULL)
@@ -52,12 +71,18 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		}
 	}
 
+	if (chan->getMember(c.getNickName()) == NULL)
+	{
+		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": requires to be member");
+		return ;
+	}
+
 	/*
-		Parsing new
+		Retrieving
 		topic message
 	*/
 	std::string topic;
-	if (arg.size() >= 2)
+	if (arg.size() >= 3)
 	{
 		if (arg.at(2)[0] == ':')
 		{
@@ -72,6 +97,17 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		}
 	}
 
+	else
+	{
+		this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": invalid parameters");
+		return ;		
+	}
+
+	/*
+		Setting channel
+		attributes and
+		broadcasting
+	*/
 	chan->setTopic(topic);
 	chan->setTopicLastModifierUsername(c.getNickName());
 	std::ostringstream oss;
