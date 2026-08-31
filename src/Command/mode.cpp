@@ -26,14 +26,34 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
 
     size_t length = params.length();
     short state = 1;
-    bool has_sign = false;
-    std::string order = ""; // Ordre des modes qui consomment un paramètre
     size_t i = 0;
+    bool has_sign = false;
 
-    // Ignorer les espaces de tête
+    /*
+        Declaring a string
+        that will contain 
+        flags implying a 
+        target in the right
+        order
+    */
+    std::string order = "";
+
+    /*
+        Skipping beginning
+        whitespaces
+    */
     for (; i < length && params[i] == ' '; i++);
 
-    // 1. Parsing du bloc de flags (ex: "+itk-l+o")
+    /*
+        Parsing part of
+        the input that
+        contains flags
+
+        Adding to 
+        'order' flags
+        implying a
+        target
+    */
     for (; i < length; i++)
     {
         if (params[i] == ' ')
@@ -64,17 +84,16 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
                     break;
                 case 'k':
                     args->flag.k = state;
-                    if (state == 1) // +k attend un argument
+                    if (state == 1)
                         order.push_back('k');
                     break;
                 case 'o':
                     args->flag.o = state;
-                    // +o et -o attendent TOUS LES DEUX un pseudo
                     order.push_back('o');
                     break;
                 case 'l':
                     args->flag.l = state;
-                    if (state == 1) // +l attend un argument, -l non
+                    if (state == 1)
                         order.push_back('l');
                     break;
             }
@@ -87,15 +106,21 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
         this->reply(c, ERR_NEEDMOREPARAMS, chan->getName() + " :Not enough parameters");
         return NULL;
     }
-
-    // 2. Récupération des arguments restants
+    
+    /*
+        Retrieving targets
+    */
     std::vector<std::string> wvec;
     std::istringstream iss(params.substr(i));
     std::string word;
     while (iss >> word)
         wvec.push_back(word);
 
-    // 3. Attribution séquentielle des paramètres
+    /*
+        Attributing each 
+        mode that implies
+        a target to it
+    */
     size_t vec_i = 0;
     for (size_t y = 0; y < order.length(); y++)
     {
