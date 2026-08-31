@@ -65,7 +65,7 @@ class Server
         std::vector<int> _epollfd;
 
         std::vector<std::string> getArgsparse(std::string str, char sep);
-        Channel *getChannelparse(std::string &str, size_t&i);
+        Channel *getChannelparse(std::string &str, size_t i);
         std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, size_t &i);
         mode_s *getflagmode(Channel *, Client *c, std::string str);
 

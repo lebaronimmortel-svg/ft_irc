@@ -21,52 +21,39 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         this->reply(&c, ERR_NOTREGISTERED, ":You have not registered");
         return;
     }
-
     size_t length = str.length();
-
     while (i < length && (str[i] == ' ' || str[i] == '\r' || str[i] == '\n'))
         i++;
-
     if (i >= length || str[i] == ':')
     {
         this->reply(&c, ERR_NORECIPIENT, ":No recipient given (PRIVMSG)");
         return;
     }
-
     size_t target_start = i;
     while (i < length && strchr("\r\n :", str[i]) == NULL)
         i++;
-
     std::string raw_targets = str.substr(target_start, i - target_start);
-
     while (i < length && str[i] == ' ')
         i++;
-
     if (i >= length)
     {
         this->reply(&c, ERR_NOTEXTTOSEND, ":No text to send");
         return;
     }
-
     if (str[i] == ':')
         i++;
-
     std::string mess = str.substr(i);
-
     size_t end = mess.find_last_not_of("\r\n");
     if (end != std::string::npos)
         mess = mess.substr(0, end + 1);
     else
         mess.clear();
-
     if (mess.empty())
     {
         this->reply(&c, ERR_NOTEXTTOSEND, ":No text to send");
         return;
     }
-
     std::vector<std::string> targets = getArgsparse(raw_targets, ',');
-
     for (size_t y = 0; y < targets.size(); y++)
     {
         std::string name = targets[y];

@@ -39,19 +39,10 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 {
 	(void) i;
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
-
-
-	/*
-	if (args.size() == 0){
-		this->reply(&c, ERR_NONICKNAMEGIVEN, str +  ": require a nickname");
-		return ;
-	}
-	*/
-
 	std::string name = cmd_sfx(str);
-	if (nicknameValid(name) && this->get_client(name, 0, 2) == NULL)
+	if (nicknameValid(name) && this->get_client(name, 0, 0) == NULL)
 	{
-		if (c.getAuthenticated() == 1)
+		if (c.getAuthenticated())
 		{
 			c.setNickName(name);
 			return ;
@@ -59,9 +50,15 @@ void Server::nick(std::string &str, size_t &i, Client &c)
 		else
 			c.setNickAuthString(1);
 	}
-	c.setNickAuth(name);
 	if (c.getAuthenticated())
+	{
+		if (this->get_client(name, 0, 0) != NULL)
+			this->reply(&c, ERR_NICKNAMEINUSE, name +  ": nickname already in use");
+		else if (!nicknameValid(name))
+			this->reply(&c, ERR_ERRONEUSNICKNAME, name +  ": erroneous nickname");
 		return ;
+	}
+	c.setNickAuth(name);
 	c.setAuthLevel(c.getAuthLevel() | (1 << NICKNAME));
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm)

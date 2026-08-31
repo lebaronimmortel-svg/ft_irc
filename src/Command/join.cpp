@@ -48,6 +48,7 @@ void Server::join(std::string &str, size_t &i, Client &c)
 			Channel *nchan = new Channel(name);
 			this->addChannel(nchan);
 			nchan->addUser(&c);
+			nchan->addModerator(&c);
 			print_new_channel(c, nchan);
 			this->reply(&c, RPL_WELCOME, ": welcome on channel: " + name);
 		}

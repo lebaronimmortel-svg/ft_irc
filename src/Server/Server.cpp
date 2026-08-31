@@ -16,6 +16,7 @@
 #include <cstring>
 
 std::string cmd_sfx_ref(std::string& str);
+void print_channel_deleted(std::map<std::string, Channel*>::iterator it);
 
 const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
 	/* RPL_WELCOME */ "001",
@@ -160,7 +161,7 @@ Client* Server::get_client(std::string nickname, int fd, int mode)
 {
 	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
-		if (mode == 0 && i->second->getNickName() == nickname)
+		if (mode == 0 && (i->second->getNickName() == nickname || i->second->getNickAuth() == nickname))
 			return (i->second);
 		if (mode == 1 && i->first == fd)
 			return (i->second);
@@ -248,20 +249,31 @@ std::vector<std::string> Server::getArgsparse(std::string str, char sep)
     return tokens;
 }
 
-Channel *Server::getChannelparse(std::string &str, size_t &i){
-	size_t len_str = str.length();
-	if (i == len_str){
-		return (NULL);
-	}
-	if (!(str[i + 1] != '#'))
-		return (NULL);
-	size_t end = str.find(' ');
-	if (end == str.npos)
-		end = len_str;
-	std::string sub(str.substr(i, end));
-	std::map<std::string, Channel *> lst = this->getChannelList();
-	i = end;
-	return ((lst.find(sub) != lst.end()) ? ((*lst.find(sub)).second) : NULL);//yeepi
+Channel *Server::getChannelparse(std::string &str, size_t i)
+{
+    size_t len_str = str.length();
+
+    while (i < len_str && str[i] == ' ')
+        i++;
+
+    if (i >= len_str || str[i] != '#')
+        return (NULL);
+
+    size_t end = str.find(' ', i);
+    if (end == std::string::npos)
+        end = len_str;
+
+    std::string sub = str.substr(i, end - i);
+    i = end;
+
+
+    std::map<std::string, Channel *> &lst = this->getChannelList();
+    std::map<std::string, Channel *>::iterator it = lst.find(sub);
+
+    if (it != lst.end())
+        return (it->second);
+
+    return (NULL);
 }
 
 std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, size_t &i)
@@ -294,14 +306,6 @@ std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str,
     }
 
     return chanvec;
-}
-
-static void print_channel_deleted(std::map<std::string, Channel*>::iterator it)
-{
-	std::cout << std::endl << BLUE << "╔═════════════════╗" << RESET << std::endl;
-	std::cout << BLUE << "║ Channel deleted ║" << std::endl;
-	std::cout << BLUE << "╚═════════════════╝" << RESET << std::endl;
-	std::cout << BLUE << "channel: " << RESET << it->first << std::endl << std::endl;	
 }
 
 void Server::clean()

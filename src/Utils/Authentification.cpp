@@ -46,9 +46,11 @@ void reset_auth_level(Server* serv, Client& c, int mode)
 /*
 	Check_authentification :
 
-		This function
-
-
+		This function is meant
+		to reinitialize client's
+		authentification levels
+		in case of an invalid 
+		authentification input
 */
 void	check_auth(Server *serv, Client& c)
 {
@@ -65,9 +67,13 @@ void	check_auth(Server *serv, Client& c)
 	else if (c.getNickAuthString() == 0)
 	{
 		if (!nicknameValid(c.getNickAuth()))
+		{
 			reset_auth_level(serv, c, 3);
-		else if (serv->get_client(c.getNickAuth(), 0, 2) != NULL)
+		}
+		else if (serv->get_client(c.getNickAuth(), 0, 0) != NULL)
+		{
 			reset_auth_level(serv, c, 2);
+		}
 		return ;
 	}
 	else

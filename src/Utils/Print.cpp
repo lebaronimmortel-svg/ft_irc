@@ -16,6 +16,14 @@ void print_header()
 	std::cout << "			╚════════════════════════════╝" << RESET << std::endl;
 }
 
+void print_channel_deleted(std::map<std::string, Channel*>::iterator it)
+{
+	std::cout << std::endl << BLUE << "╔═════════════════╗" << RESET << std::endl;
+	std::cout << BLUE << "║ Channel deleted ║" << std::endl;
+	std::cout << BLUE << "╚═════════════════╝" << RESET << std::endl;
+	std::cout << BLUE << "channel: " << RESET << it->first << std::endl << std::endl;	
+}
+
 void print_client_quit(std::string user, std::string nick, int fd)
 {
 	std::cout << std::endl << BLUE << "╔════════════════════╗" << RESET << std::endl;
