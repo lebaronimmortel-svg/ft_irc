@@ -86,7 +86,7 @@ class Server
         std::vector<Channel *>*     getChannelListparse(Client *c, std::string &str, size_t &i);
 
         // Mode
-        mode_s *getFlagMode(Channel *, Client *c, const std::string& str);
+        mode_s* getFlagMode(Channel *, Client *c, const std::string& str);
 
     public :
 
@@ -102,9 +102,9 @@ class Server
         int                      getSocket();
         std::vector<int>&        getfdList();
         sockaddr_in              getAddress();
-        Client*  getClient(std::string username, int fd, int mode);
-        cmdfunc	 getcmd(std::string str);
-        Channel* getChannel(std::string name);
+        Client*                  getClient(std::string username, int fd, int mode);
+        cmdfunc	                 getcmd(std::string str);
+        Channel*                 getChannel(std::string name);
         std::map<std::string, Channel *> &getChannelList();
 
         // setters
