@@ -44,7 +44,7 @@ void	kick_user(Channel* chan, Client *user, std::string reason)
 		parsed provided input,
 		then execute the kick
 */
-int	Server::kick_lexer(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy)
+int	Server::kickParser(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy)
 {
 	if (names.size() > 0 && names[0] == ':')
 		return (1) ;						
@@ -133,7 +133,7 @@ void Server::kick(std::string &str, size_t &i, Client &c)
 		{
 			for (size_t j = 0; j < lenght_user; j++)
 			{
-				if (this->kick_lexer(users.at(j), reason, channels[j], c, i, str, cpy))
+				if (this->kickParser(users.at(j), reason, channels[j], c, i, str, cpy))
 					break ;
 			}
 			this->clean();
@@ -151,7 +151,7 @@ void Server::kick(std::string &str, size_t &i, Client &c)
 	{
 		for (size_t j = 0; j < lenght_chan; j++)
 		{
-			if (this->kick_lexer(users.at(0), reason, channels[j], c, i, str, cpy))
+			if (this->kickParser(users.at(0), reason, channels[j], c, i, str, cpy))
 				break ;
 		}
 		this->clean();

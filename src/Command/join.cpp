@@ -14,7 +14,7 @@
 #include "../../includes/Client.hpp"
 
 // parsing
-std::string cmd_sfx_ref(std::string& str);
+std::string cmdSfxRef(std::string& str);
 
 // print
 void print_new_channel(Client& c, Channel* nchan);
@@ -31,19 +31,19 @@ void print_join_channel(Client& c, Channel* chan);
 */
 void Server::join(std::string &str, size_t &i, Client &c)
 {
-	/*
-		Lexing provided input
-	*/
 	if (!c.getAuthenticated())
 	{
 		this->reply(&c, ERR_NOTREGISTERED, "IRCServer: require registration");
 		return;
 	}
+
+	/*
+		Parsing provided input
+	*/
+	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	std::vector<Channel *> *channels = this->getChannelListparse(&c, str, i);
 	if (channels == NULL)
 		return ;
-
-	std::vector<std::string> args = this->getArgsparse(str, ' ');
 
 	int lenght = channels->size();
 	int lenght_args = args.size();
@@ -62,11 +62,11 @@ void Server::join(std::string &str, size_t &i, Client &c)
 		*/
 		if (!chan)
 		{
-			std::string name = this->getArgsparse(cmd_sfx_ref(str), ',').at(i);
+			std::string name = this->getArgsparse(cmdSfxRef(str), ',').at(i);
 			if (name.empty() || name[0] != '#')
 				continue ;
 			Channel *nchan = new Channel(name);
-			this->addChannel(nchan);
+			this->addChannelName(nchan);
 			nchan->addUser(&c);
 			nchan->addModerator(&c);
 			print_new_channel(c, nchan);

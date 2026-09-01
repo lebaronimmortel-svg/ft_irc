@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Authentification.cpp                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
+/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
+// parsing 
 bool nicknameValid(std::string str);
 
 /*
@@ -9,28 +22,16 @@ bool nicknameValid(std::string str);
 		This function is meant to reinitialise
 		authentification fields statuses
 		in case of authentification failure 
-
-		mode == 0 :
-			Wrong password has been submitted
-
-		mode == 1 :
-			Wrong username format
-
-		mode == 2 :
-			Nickname already in use
-		
-		mode == 3 :
-			Erroneous nickname
 */
-void reset_auth_level(Server* serv, Client& c, int mode)
+void resetAuthLevel(Server* serv, Client& c, int mode)
 {
 	c.setAuthLevel(c.getAuthLevel() & ~(1 << PASSWORD));
 	c.setAuthLevel(c.getAuthLevel() & ~(1 << USERNAME));
 	c.setAuthLevel(c.getAuthLevel() & ~(1 << NICKNAME));
 	c.setNickAuth("");
 	c.setUserAuth("");
-	c.setUserAuthString(0);
-	c.setNickAuthString(0);
+	c.setUserAuthTmp(0);
+	c.setNickAuthTmp(0);
 	c.setPassAuth(0);
 
 	if (mode == 0)
@@ -52,28 +53,24 @@ void reset_auth_level(Server* serv, Client& c, int mode)
 		in case of an invalid 
 		authentification input
 */
-void	check_auth(Server *serv, Client& c)
+void	checkAuth(Server *serv, Client& c)
 {
 	if (c.getPassAuth() == 0)
 	{
-		reset_auth_level(serv, c, 0);
+		resetAuthLevel(serv, c, 0);
 		return ;
 	}
-	else if (c.getUserAuthString() == 0)
+	else if (c.getUserAuthTmp() == 0)
 	{
-		reset_auth_level(serv, c, 1);
+		resetAuthLevel(serv, c, 1);
 		return ;
 	}
-	else if (c.getNickAuthString() == 0)
+	else if (c.getNickAuthTmp() == 0)
 	{
 		if (!nicknameValid(c.getNickAuth()))
-		{
-			reset_auth_level(serv, c, 3);
-		}
-		else if (serv->get_client(c.getNickAuth(), 0, 0) != NULL)
-		{
-			reset_auth_level(serv, c, 2);
-		}
+			resetAuthLevel(serv, c, 3);
+		else if (serv->getClient(c.getNickAuth(), 0, 0) != NULL)
+			resetAuthLevel(serv, c, 2);
 		return ;
 	}
 	else

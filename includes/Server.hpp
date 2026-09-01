@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
+/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #define RESET   "\033[0m"      
@@ -26,7 +38,8 @@
 	#endif
 #endif
 
-struct mode_flag{
+struct mode_flag
+{
 	short i;
 	short t;
 	short k;
@@ -34,88 +47,92 @@ struct mode_flag{
 	short l;
 };
 
-struct mode_value{
+struct mode_value
+{
 	std::string k;
 	size_t l;
 	std::vector<std::string> o;
 };
 
-struct mode_s{
+struct mode_s
+{
 	mode_value value;
 	mode_flag flag;
 };
 
 class Server;
-
 typedef void (Server::*cmdfunc)(std::string &str, size_t &i,Client &);
 
 class Server
 {
     private :
 
-        // channels
+        // stores objects
         std::map<std::string, Channel*> _channels;
-        std::map<int, Client*> _clients;
+        std::map<int, Client*>      _clients;
         
-        // password for the channel
-        std::string _password;
-        int _servsock;
-        int _epollfdserv;
-        sockaddr_in _servaddr;
-        std::vector<int> _epollfd;
+        // server password
+        std::string                 _password;
 
-        std::vector<std::string> getArgsparse(std::string str, char sep);
-        Channel *getChannelparse(std::string &str, size_t i);
-        std::vector<Channel *> *getChannelListparse(Client *c, std::string &str, size_t &i);
-        mode_s *getflagmode(Channel *, Client *c, const std::string& str);
+        // TCP
+        int                         _servsock;
+        int                         _epollfdserv;
+        sockaddr_in                 _servaddr;
+        std::vector<int>            _epollfd;
+
+        // Parser
+        std::vector<std::string>    getArgsparse(std::string str, char sep);
+        Channel*                    getChannelparse(std::string &str, size_t i);
+        std::vector<Channel *>*     getChannelListparse(Client *c, std::string &str, size_t &i);
+
+        // Mode
+        mode_s *getFlagMode(Channel *, Client *c, const std::string& str);
 
     public :
 
+        // Constructor
         Server(int port, std::string pass);
+
+        // Destructor
         ~Server();
 
         // getters
-        std::map<std::string, Channel *> &getChannelList();
         inline const std::string getPassword() const;
-        int getEpollFd();
-        int getSocket();
-        std::vector<int> &getfdlist();
-        sockaddr_in getAddress();
+        int                      getEpollFd();
+        int                      getSocket();
+        std::vector<int>&        getfdList();
+        sockaddr_in              getAddress();
+        Client*  getClient(std::string username, int fd, int mode);
+        cmdfunc	 getcmd(std::string str);
+        Channel* getChannel(std::string name);
+        std::map<std::string, Channel *> &getChannelList();
 
         // setters
         void    setPassword(std::string password);
-        Client	*find_client(int fd);
+        Client* find_client(int fd);
 
         // utils
         void	addClient(int client_fd);
-        void    removeClient(int fd);
-        void	addChannel(Channel *channel);
-        Client	*get_client(std::string username, int fd, int mode);
-        cmdfunc	getcmd(std::string str);
-        int		callcmd(std::string str, Client &);
         void    HandleClient(Client *c);
+        void    addChannel(Channel *channel, std::string name);
+        void    addChannelName(Channel *chan);
+        int	    kickParser(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy);
+        void    removeClient(int fd);
+        int		callcmd(std::string str, Client &);
+        void    clean();
 
         //reply
-        void reply(Client *c, reply_flag flag, std::string msg);
-        void replyChannel(Channel *c, std::string msg);
+        void    reply(Client *c, reply_flag flag, std::string msg);
+        void    replyChannel(Channel *c, std::string msg);
 
         //command
-        void invite(std::string &str, size_t &i, Client &);
-        void kick(std::string &str, size_t &i, Client &);
-        void topic(std::string &str, size_t &i, Client &);
-        void mode(std::string &str, size_t &i, Client &);
-        void pass(std::string &str, size_t &i, Client &);
-        void nick(std::string &str, size_t &i, Client &);
-        void user(std::string &str, size_t &i, Client &);
-        void join(std::string &str, size_t &i, Client &);
-        void privmsg(std::string &str, size_t &i, Client &);
-        Channel *get_channel(std::string name);
-
-        int	kick_lexer(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy);
-
-        // setters
-        void addChannel(Channel *channel, std::string name);
-
-        void clean();
-
+        void    invite(std::string &str, size_t &i, Client &);
+        void    kick(std::string &str, size_t &i, Client &);
+        void    topic(std::string &str, size_t &i, Client &);
+        void    mode(std::string &str, size_t &i, Client &);
+        void    pass(std::string &str, size_t &i, Client &);
+        void    nick(std::string &str, size_t &i, Client &);
+        void    user(std::string &str, size_t &i, Client &);
+        void    join(std::string &str, size_t &i, Client &);
+        void    privmsg(std::string &str, size_t &i, Client &);
 };

@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 #pragma once
+
 #include <vector>
 #include <iostream>
 #include "Server.hpp"
 
-
-
-enum cmdlistenum {
+enum cmdlistenum 
+{
     INVITE,
     KICK,
     TOPIC,
@@ -25,11 +25,12 @@ enum cmdlistenum {
     PASS,
     NICK,
     NAME,
-    JOIN,// to do
-    PRIVMSG,// to do
+    JOIN,
+    PRIVMSG,
 };
 
-struct cmdlist {
+struct cmdlist 
+{
     std::string name;
     cmdfunc call;
 };

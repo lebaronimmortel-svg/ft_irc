@@ -15,10 +15,21 @@
 #include "../../includes/Client.hpp"
 #include <cstring>
 
-std::string cmd_sfx_ref(std::string& str);
+// parsing
+std::string cmdSfxRef(std::string& str);
+std::string cmdPfx(std::string str);
+
+// print
 void print_channel_deleted(std::map<std::string, Channel*>::iterator it);
 
-const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
+/*
+	reply_flag_value
+
+		List of IRC norm based
+		error codes
+*/
+const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = 
+{
 	/* RPL_WELCOME */ "001",
 	/*RPL_WELCOME*/"001",
 	/*RPL_YOURHOST*/"002",
@@ -59,7 +70,15 @@ const std::string reply_flag_value[ERR_NOTREGISTERED + 2] = {
 	/*ERR_NOTREGISTERED*/"451",
 };
 
-cmdlist cmdLU[] = {
+/*
+	Commands
+
+		List of commands
+		and their corresponding
+		server functions
+*/
+cmdlist cmdLU[] = 
+{
     /*[INVITE]*/
 	{
         .name = "INVITE",
@@ -107,7 +126,11 @@ cmdlist cmdLU[] = {
     },
 };
 
-Server::Server(int port, std::string pass): _password(pass){
+/*
+	Constructor
+*/
+Server::Server(int port, std::string pass): _password(pass)
+{
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_servsock < 0)
 		throw std::runtime_error("Error Initialization socket");
@@ -146,18 +169,22 @@ Server::Server(int port, std::string pass): _password(pass){
 	this->_epollfd.push_back(this->_epollfdserv);
 }
 
-Server::~Server(){
+/*
+	Destructor
+*/
+Server::~Server()
+{
 	size_t size = this->_epollfd.size();
 	for (size_t i = 0; i < size; i++)
 		close(this->_epollfd[i]);
 }
 
-int Server::getEpollFd() {return this->_epollfdserv;};
-int Server::getSocket() {return this->_servsock;};
-std::vector<int> &Server::getfdlist(){return this->_epollfd;};
-sockaddr_in Server::getAddress() {return this->_servaddr;};
-
-Client* Server::get_client(std::string nickname, int fd, int mode)
+/*
+	get_client
+	(by nickname or
+	by file descriptor)
+*/
+Client* Server::getClient(std::string nickname, int fd, int mode)
 {
 	for (std::map<int, Client*>::iterator i = _clients.begin(); i != _clients.end(); i++)
 	{
@@ -171,37 +198,44 @@ Client* Server::get_client(std::string nickname, int fd, int mode)
 	return (NULL);
 }
 
+/*
+	add_client
+*/
 void Server::addClient(int client_fd)
 {
 	Client *client = new Client(client_fd);
 	_clients.insert(std::make_pair(client_fd ,client));
 }
 
+/*
+	remove_client
+*/
 void	Server::removeClient(int fd)
 {
 	_clients.erase(fd);
 }
 
+/*
+	get_channels_list
+*/
 std::map<std::string, Channel *> &Server::getChannelList()
 {
 	return this->_channels;
 }
 
-void Server::addChannel(Channel *chan)
+/*
+	add_channel_name
+*/
+void Server::addChannelName(Channel *chan)
 {
 	this->_channels[chan->getName()] = chan;
 }
 
-static std::string cmd_pfx(std::string str)
+/*
+	get_command
+*/
+cmdfunc Server::getcmd(std::string str)
 {
-	unsigned long i = 0;
-	std::string res = "";
-	while (i < str.size() && str[i] != ' ')
-		res += str[i++];
-	return res;
-}
-
-cmdfunc Server::getcmd(std::string str){
 	size_t lenght = str.length();
 	if (lenght == 0)
 		return (NULL);
@@ -215,13 +249,17 @@ cmdfunc Server::getcmd(std::string str){
 		sep = str.length();
 	std::string cmd = str.substr(slash, sep);
 	for (int i = 0; i < PRIVMSG + 1; i++){
-		if (cmd_pfx(cmd) ==  cmdLU[i].name)
+		if (cmdPfx(cmd) ==  cmdLU[i].name)
 			return cmdLU[i].call;
 	}
 	return (NULL);
 }
 
-int Server::callcmd(std::string str, Client &c){
+/*
+	call_command
+*/
+int Server::callcmd(std::string str, Client &c)
+{
 	cmdfunc func = this->getcmd(str);
 	if (!func)
 	{
@@ -236,6 +274,9 @@ int Server::callcmd(std::string str, Client &c){
 	return 1;
 }
 
+/*
+	get_arguments_parsed
+*/
 std::vector<std::string> Server::getArgsparse(std::string str, char sep)
 {
     std::vector<std::string> tokens;
@@ -250,6 +291,9 @@ std::vector<std::string> Server::getArgsparse(std::string str, char sep)
     return tokens;
 }
 
+/*
+	get_channel_parsed
+*/
 Channel *Server::getChannelparse(std::string &str, size_t i)
 {
     size_t len_str = str.length();
@@ -276,10 +320,13 @@ Channel *Server::getChannelparse(std::string &str, size_t i)
     return (NULL);
 }
 
+/*
+	get_channels_list_parsed
+*/
 std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str, size_t &i)
 {
     (void) i;
-    std::string params = cmd_sfx_ref(str);
+    std::string params = cmdSfxRef(str);
     
     size_t space_pos = params.find(' ');
     std::string chan_list_str = (space_pos != std::string::npos) ? params.substr(0, space_pos) : params;
@@ -308,7 +355,10 @@ std::vector<Channel *> *Server::getChannelListparse(Client *c, std::string &str,
     return chanvec;
 }
 
-Channel* Server::get_channel(std::string name)
+/*
+	get_channel
+*/
+Channel* Server::getChannel(std::string name)
 {
     try 
     {
@@ -321,6 +371,39 @@ Channel* Server::get_channel(std::string name)
     }
 }
 
+/*
+	get_epoll_fd
+*/
+int Server::getEpollFd()
+{
+	return this->_epollfdserv;
+};
+
+/*
+	get_socket
+*/
+int Server::getSocket() 
+{
+	return this->_servsock;
+};
+
+/*
+	get_fd_list
+*/
+std::vector<int> &Server::getfdList()
+{
+	return this->_epollfd;
+};
+
+sockaddr_in Server::getAddress() 
+{
+	return this->_servaddr;
+};
+
+/*
+	clean
+	(closes empty channels)
+*/
 void Server::clean()
 {
     std::map<std::string, Channel*>::iterator it = _channels.begin();
@@ -338,22 +421,32 @@ void Server::clean()
     }
 }
 
-void Server::reply(Client *c, reply_flag flag, std::string msg){
+/*
+	reply
+*/
+void Server::reply(Client *c, reply_flag flag, std::string msg)
+{
 	std::string name = (c->getNickName().empty()) ? "*" : c->getNickName();
 	std::string message = ":ircserv " + reply_flag_value[flag] + " " + name
 	 + " " + msg + "\r\n";
 	send (c->getFd(), message.c_str(), message.size(), 0);
 }
 
-void Server::replyChannel(Channel *chan, std::string msg){
+/*
+	reply_channel
+*/
+void Server::replyChannel(Channel *chan, std::string msg)
+{
 	msg += "\r\n";
 	std::map<std::string, Client *> mem = chan->getMembers();
 	std::map<std::string, Client *>::iterator end = mem.end();
-	for (std::map<std::string, Client *>::iterator it = mem.begin(); it != end; it++){
+	for (std::map<std::string, Client *>::iterator it = mem.begin(); it != end; it++)
 		send((*it).second->getFd(), msg.c_str(), msg.size(), 0);
-	}
 }
 
+/*
+	handle_client
+*/
 void Server::HandleClient(Client *c)
 {
 	std::string &buff = c->getBuffer();

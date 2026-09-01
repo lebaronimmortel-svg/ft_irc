@@ -127,7 +127,7 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         */
         else 
         {
-            Client *dest = this->get_client(name, 0, 0);
+            Client *dest = this->getClient(name, 0, 0);
             if (!dest)
             {
                 this->reply(&c, ERR_NOSUCHNICK, name + " :No such nick/channel");

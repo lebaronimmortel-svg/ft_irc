@@ -4,7 +4,7 @@
 #include <sstream>
 
 // parsing
-std::string cmd_sfx_ref_word(std::string& str);
+std::string cmdSfxRefWord(std::string& str);
 
 /*
     get_flag_mode
@@ -15,8 +15,14 @@ std::string cmd_sfx_ref_word(std::string& str);
         structure modes and targets 
         on which it should be applied  
 */
-mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
+mode_s *Server::getFlagMode(Channel *chan, Client *c, const std::string &params)
 {
+
+    /*
+        Initializing 
+        storing
+        structure
+    */
     mode_s *args = new mode_s();
     args->flag.i = -1;
     args->flag.t = -1;
@@ -24,18 +30,15 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
     args->flag.o = -1;
     args->flag.l = -1;
 
+    /*
+        Initializing 
+        browsing
+        parameters
+    */
     size_t length = params.length();
     short state = 1;
     size_t i = 0;
     bool has_sign = false;
-
-    /*
-        Declaring a string
-        that will contain 
-        flags implying a 
-        target in the right
-        order
-    */
     std::string order = "";
 
     /*
@@ -47,12 +50,9 @@ mode_s *Server::getflagmode(Channel *chan, Client *c, const std::string &params)
     /*
         Parsing part of
         the input that
-        contains flags
-
-        Adding to 
-        'order' flags
-        implying a
-        target
+        contains flags,
+        storing flags
+        implying a target
     */
     for (; i < length; i++)
     {
@@ -165,7 +165,7 @@ void Server::mode(std::string &str, size_t &i, Client &c)
         from provided input
     */
     size_t cpy = i;
-	std::string names = cmd_sfx_ref_word(str);
+	std::string names = cmdSfxRefWord(str);
     Channel *chan = this->getChannelparse(names, 0);
 
     if (chan == NULL)
@@ -196,7 +196,7 @@ void Server::mode(std::string &str, size_t &i, Client &c)
         corresponding targets
         into a structure
     */
-    mode_s *args = this->getflagmode(chan, &c, str.substr(param_start)); 
+    mode_s *args = this->getFlagMode(chan, &c, str.substr(param_start)); 
     if (args == NULL)
         return;
 

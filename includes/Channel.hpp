@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
+/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <string>
@@ -14,28 +26,29 @@ class Channel
         std::map<std::string, Client*> _invited;
 
         // channel name and password
-        std::string _name;
-        std::string _password;
+        std::string                    _name;
+        std::string                    _password;
 
         // channel modes
-        bool _requires_password;
-        bool _invite_only_mod;
-        bool _topic_restriction;
+        bool                           _requires_password;
+        bool                           _invite_only_mod;
+        bool                           _topic_restriction;
 
         // topic-related infos 
-        std::string _topic;
-        std::string _topic_last_modif_date;
-        std::string _topic_last_modifier_username;
+        std::string                    _topic;
+        std::string                    _topic_last_modif_date;
+        std::string                    _topic_last_modifier_username;
 
         // max number of users allowed (0 == no limit)
         unsigned int _user_limit;
 
     public :
 
-        // constructor/destructor
-        Channel();
-        ~Channel();
+        // constructor
         Channel(std::string name);
+
+        // destructor
+        ~Channel();
 
         // getters
         std::string  getName();
@@ -64,16 +77,13 @@ class Channel
         void         setTopicLastModifierUsername(std::string username);
         void         setUserLimit(unsigned int limit);
 
-        const std::map<std::string, Client*>& getMembers() const { return _members; }
-
-        //std::string belongs_to_channel(int fd);
-        void        addUser(Client *client);
-        void        addModerator(Client *);
-        void        delModerator(Client *);
-        void        addinvited(Client *);
-        void        delMember(Client *);
-        void        delInvited(Client *);
-
-        void broadcast(std::string msg, int fd);
+        // utils
+        void         addUser(Client *client);
+        void         addModerator(Client *);
+        void         addInvited(Client *);
+        void         delModerator(Client *);
+        void         delMember(Client *);
+        void         delInvited(Client *);
+        void         broadcast(std::string msg, int fd);
 };
 

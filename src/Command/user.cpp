@@ -14,12 +14,12 @@
 #include "../../includes/Client.hpp"
 
 // parsing 
-std::string cmd_sfx(std::string str);
-std::string cmd_sfx_full(std::string str);
+std::string cmdSfx(std::string str);
+std::string cmdSfxFull(std::string str);
 
 // authentification
-void reset_auth_level(Server* serv, Client& c, int mode);
-void check_auth(Server *serv, Client& c);
+void resetAuthLevel(Server* serv, Client& c, int mode);
+void checkAuth(Server *serv, Client& c);
 
 /*
 	username
@@ -42,11 +42,11 @@ void Server::user(std::string &str, size_t &i, Client &c)
 
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	if (args.size() >= 5)
-		c.setUserAuthString(1);
-	c.setUserAuth(cmd_sfx_full(str));
+		c.setUserAuthTmp(1);
+	c.setUserAuth(cmdSfxFull(str));
 	c.setAuthLevel(c.getAuthLevel() | (1 << USERNAME));
 
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
 	if ((c.getAuthLevel() & reqperm) == reqperm)
-		check_auth(this, c);
+		checkAuth(this, c);
 }

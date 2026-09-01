@@ -13,7 +13,6 @@
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-
 /*
 	invite
 
@@ -45,7 +44,7 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		Extracting targeted channel
 		from parsed input
 	*/
-	Channel *chan = this->get_channel(arg.at(1));
+	Channel *chan = this->getChannel(arg.at(1));
 	if (chan == NULL)
 	{
 		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) + ": this channel doesn't exist");
@@ -62,7 +61,7 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		Extracting targeted client
 		from parsed input
 	*/
-	Client *user = this->get_client(arg.at(2), 0, 2);
+	Client *user = this->getClient(arg.at(2), 0, 2);
 	if (user == NULL)
 		this->reply(&c, ERR_NOSUCHNICK, chan->getName() +  ": no such nickname");
 	else
@@ -70,7 +69,7 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		/*
 			Inviting
 		*/
-		chan->addinvited(user);
+		chan->addInvited(user);
 		std::string msg = "You have been invited by " + c.getNickName() + " to join channel " + chan->getName() + "\r\n"; 
 		send(user->getFd(), msg.c_str(), msg.size(), 0);
 	}

@@ -1,88 +1,93 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
+/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include "Channel.hpp"
 
-enum authentification{
+enum authentification
+{
     PASSWORD,
     USERNAME,
     NICKNAME,
 };
 
-
 class Client
 {
     private :
     
+        // channels registered in
         std::map<std::string, Channel*> _channels;
         std::map<std::string, Channel*> _channels_inv;
 
-    	// identifier in the server
-        std::string _nickname;
-        
+        // identifier
+        int _fd;
+
         // used to authenticate
+        std::string _nickname;
         std::string _username;
-        std::string _fullname;
         std::string _user_auth;
         std::string _nick_auth;
-        
-        // status in the server 
+        bool _user_auth_tmp;
+        bool _nick_auth_tmp;
+        bool _pass_auth;
         bool _authenticated;
-
-        // where to read/write
-        int _fd;
-        int _user_auth_string;
-        int _nick_auth_string;
+        size_t   _auth_level;
 
         // stores current command
         std::string _buffer;
 
-        int _pass_auth;
-
-        size_t   authLevel;
-
     public :
 
-        // constructor/destructor
-        Client();
-        ~Client();
+        // constructor
         Client(int fd);
 
-        // getters
-        std::string getNickName();
-        std::string getFullName();
-        std::string getUserName();
-        bool        getAuthenticated();
-        int         getFd();
-        std::string &getBuffer();
-        size_t      &getAuthLevel();
-        const std::map<std::string, Channel*>& getChannels() const { return _channels; }
-        int getPassAuth() { return _pass_auth; }
-        int getUserAuthString() { return _user_auth_string; }
-        int getNickAuthString() { return _nick_auth_string; }
+        // destructor
+        ~Client();
 
-        std::string    getUserAuth() { return _user_auth; }
-        std::string    getNickAuth() { return _nick_auth; }
+        // getters
+        std::string     getNickName();
+        std::string     getFullName();
+        std::string     getUserName();
+        bool            getAuthenticated();
+        int             getFd();
+        std::string     &getBuffer();
+        size_t          &getAuthLevel();
+        int             getPassAuth();
+        int             getUserAuthTmp();
+        int             getNickAuthTmp();
+        std::string     getUserAuth();
+        std::string     getNickAuth();
+        std::map<std::string, Channel*>& getChannels();
 
         // setters
-        void        setNickName(std::string nickname);
-        void        setFullName(std::string fullname);
-        void        setUserName(std::string username);
-        void        setAuthenticated(bool authenticated); 
-        void        setFd(int fd);
-        void        setAuthLevel(size_t level);
-        void        setBuffer(std::string);
-        void        setPassAuth(int i) { _pass_auth = i; }
-        void        setUserAuthString(int i) { _user_auth_string = i; }
-        void        setNickAuthString(int i) { _nick_auth_string = i; }
+        void            setNickName(std::string nickname);
+        void            setFullName(std::string fullname);
+        void            setUserName(std::string username);
+        void            setAuthenticated(bool authenticated); 
+        void            setfd(int fd);
+        void            setAuthLevel(size_t level);
+        void            setBuffer(std::string);
+        void            setPassAuth(int i);
+        void            setUserAuthTmp(int i);
+        void            setNickAuthTmp(int i);
+        void            setUserAuth(std::string str);
+        void            setNickAuth(std::string str);
 
-        //int     is_chan_member();
-        void    addChannel(Channel* channel);
-        void    addChannelInv(Channel* channel);
-        void    delChannel(Channel* channel);
-        int     is_invited(Channel* channel);
-        void    delInvChan(Channel *channel);
-        void    leaveAllChannels();
-
-        void    setUserAuth(std::string str) { _user_auth = str; }
-        void    setNickAuth(std::string str) { _nick_auth = str; }
+        // utils
+        void            addChannel(Channel* channel);
+        void            addChannelInv(Channel* channel);
+        void            delChannel(Channel* channel);
+        void            delInvChan(Channel *channel);
+        bool            isInvited(Channel* channel);
+        void            leaveAllChannels();
 };

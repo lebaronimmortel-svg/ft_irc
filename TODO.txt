@@ -1,0 +1,6 @@
+- Rajouter des reply d'erreur selon norme IRC
+- Conformer les reply msg à la norme IRC
+- Régler les leaks
+- Protéger les throws avec des try/catch
+- Prendre en charge les espaces de début dans les input
+- Bot
