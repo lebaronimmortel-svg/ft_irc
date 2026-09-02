@@ -35,6 +35,7 @@ void Server::invite(std::string &str, size_t &i, Client &c)
 		Parsing provided input
 	*/
 	std::vector<std::string> arg = this->getArgsparse(str, ' ');
+
 	if (arg.size() == 0)
 		return;
 		

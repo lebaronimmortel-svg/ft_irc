@@ -5,6 +5,7 @@
 
 // parsing
 std::string cmdSfxRefWord(std::string& str);
+int nb_first_sp(std::string str);
 
 /*
     get_flag_mode
@@ -166,6 +167,7 @@ void Server::mode(std::string &str, size_t &i, Client &c)
     */
     size_t cpy = i;
 	std::string names = cmdSfxRefWord(str);
+
     Channel *chan = this->getChannelparse(names, 0);
 
     if (chan == NULL)
@@ -178,7 +180,7 @@ void Server::mode(std::string &str, size_t &i, Client &c)
         Extracting targeted users
         from provided input
     */
-    size_t param_start = names.size() + 6;
+    size_t param_start = names.size() + 5 + nb_first_sp(str); //
     if (param_start == std::string::npos)
     {
         this->reply(&c, RPL_CHANNELMODEIS, chan->getName() + ": no target provided");

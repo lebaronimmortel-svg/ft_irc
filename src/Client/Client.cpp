@@ -42,7 +42,7 @@ std::string Client::getNickName()
 */
 std::string Client::getNickAuth()
 {
-    return _nickname;
+    return _nick_auth;
 }
 
 /*
@@ -58,7 +58,7 @@ int Client::getNickAuthTmp()
 */
 std::string Client::getUserAuth()
 {
-    return _nickname;
+    return _user_auth;
 }
 
 /*

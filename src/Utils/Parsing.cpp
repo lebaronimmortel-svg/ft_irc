@@ -72,9 +72,10 @@ std::string cmdSfxRef(std::string& str)
 	std::string res = "";
 	while (i < len && str[i] != ' ')
 		i++;
+	while (str[i] == ' ')
+		i++;
 	if (i == len)
 		return res;
-	i++;
 	while (i < len)
 			res += str[i++];
 	return res;
@@ -95,9 +96,10 @@ std::string cmdSfxRefWord(std::string& str)
 	std::string res = "";
 	while (i < len && str[i] != ' ')
 		i++;
+	while (str[i] == ' ')
+		i++;
 	if (i == len)
 		return res;
-	i++;
 	while (i < len && str[i] != ' ')
 			res += str[i++];
 	return res;
@@ -118,6 +120,26 @@ std::string cmdPfx(std::string str)
 	while (i < str.size() && str[i] != ' ')
 		res += str[i++];
 	return res;
+}
+
+/*
+	number_of_first_spaces
+
+		This function is meant to
+		give the number of spaces
+		in the first spaces set
+		encountered
+*/
+int nb_first_sp(std::string str)
+{
+	unsigned long i = 0;
+	unsigned long j = 0;
+
+	while (i < str.size() && str[i] != ' ')
+		i++;
+	while (i + j < str.size() && str[i + j] == ' ')
+		j++;
+	return (j); 
 }
 
 /*
