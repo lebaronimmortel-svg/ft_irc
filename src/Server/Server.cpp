@@ -261,6 +261,13 @@ cmdfunc Server::getcmd(std::string str)
 int Server::callcmd(std::string str, Client &c)
 {
 	cmdfunc func = this->getcmd(str);
+
+	// debug
+
+	std::cout << str << std::endl;
+
+	// debug
+
 	if (!func)
 	{
 		if (c.getAuthenticated() == 1)
