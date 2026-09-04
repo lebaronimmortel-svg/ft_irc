@@ -134,34 +134,42 @@ Server::Server(int port, std::string pass): _password(pass)
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_servsock < 0)
 		throw std::runtime_error("Error Initialization socket");
-	this->_servaddr = (struct sockaddr_in){
+	this->_servaddr = (struct sockaddr_in)
+	{
 		.sin_family = AF_INET,
 		.sin_port = htons(port),
-		.sin_addr = {
+		.sin_addr = 
+		{
 			.s_addr = INADDR_ANY,
 		}
 	};
 
-	if (bind(this->_servsock, (struct sockaddr *)&this->_servaddr, sizeof(this->_servaddr)) == -1){
+	if (bind(this->_servsock, (struct sockaddr *)&this->_servaddr, sizeof(this->_servaddr)) == -1)
+	{
 		close(this->_servsock);
 		throw std::runtime_error("Error binding server socket");
 	}
-	if (listen(this->_servsock, SOMAXCONN) == -1){
+	if (listen(this->_servsock, SOMAXCONN) == -1)
+	{
 		close(this->_servsock);
 		throw std::runtime_error("Error setting up listen limit");
 	}
 	this->_epollfdserv = epoll_create1(O_CLOEXEC);
-	if (this->_epollfdserv < 0){
+	if (this->_epollfdserv < 0)
+	{
 		close(this->_epollfdserv);
 		throw std::runtime_error("Error Initialization Epoll");
 	}
-	struct epoll_event serv_event = {
+	struct epoll_event serv_event = 
+	{
 		.events = EPOLLIN,
-		.data = {
+		.data = 
+		{
 			.fd = this->_servsock,
 		}
 	};
-	if (epoll_ctl(this->_epollfdserv, EPOLL_CTL_ADD, this->_servsock, &serv_event) < 0){
+	if (epoll_ctl(this->_epollfdserv, EPOLL_CTL_ADD, this->_servsock, &serv_event) < 0)
+	{
 		close(this->_servsock);
 		close(this->_epollfdserv);
 		throw std::runtime_error("Error adding event to listen queue");

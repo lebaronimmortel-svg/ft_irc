@@ -36,6 +36,42 @@ void	kick_user(Channel* chan, Client *user, std::string reason)
 }
 
 /*
+	kick_single_channel
+
+		This function
+		is meant to parse 
+		a channel from a string
+		and kick targeted users 
+		from it
+*/
+void Server::kickSingleChan(std::string str, size_t cpy, size_t i, Client& c, std::string reason, size_t lenght_user, std::vector<std::string> channels, std::vector<std::string> users)
+{
+	Channel *chan = this->getChannelparse(channels[0], 0);
+	if (chan == NULL)
+	{
+		this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) +  ": this channel doesn't exist");
+		return ;
+	}
+	if (chan->getModerator(c.getNickName()) == NULL)
+	{
+		this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": require to be operator");
+		return ;
+	}
+	for (size_t j = 0; j < lenght_user; j++)
+	{
+		std::string names = users.at(j);
+		if (names.size() > 0 && names[0] == ':')
+			break ;						
+		Client *user = chan->getMember(names);
+		if (user == NULL)
+			this->reply(&c, ERR_USERNOTINCHANNEL, chan->getName() +  ": no such nickname in channel");
+		else 
+			kick_user(chan, user, reason);
+	}
+	this->clean();
+}
+
+/*
 	kick lexer
 
 		This function is meant to
@@ -166,29 +202,5 @@ void Server::kick(std::string &str, size_t &i, Client &c)
 			from one channel
 	*/
 	else 
-	{
-		Channel *chan = this->getChannelparse(channels[0], 0);
-		if (chan == NULL)
-		{
-			this->reply(&c, ERR_NOSUCHCHANNEL, str.substr(cpy, i - cpy) +  ": this channel doesn't exist");
-			return ;
-		}
-		if (chan->getModerator(c.getNickName()) == NULL)
-		{
-			this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() +  ": require to be operator");
-			return ;
-		}
-		for (size_t j = 0; j < lenght_user; j++)
-		{
-			std::string names = users.at(j);
-			if (names.size() > 0 && names[0] == ':')
-				break ;						
-			Client *user = chan->getMember(names);
-			if (user == NULL)
-				this->reply(&c, ERR_USERNOTINCHANNEL, chan->getName() +  ": no such nickname in channel");
-			else 
-				kick_user(chan, user, reason);
-		}
-		this->clean();
-	}
+		kickSingleChan(str, cpy, i, c, reason, lenght_user, channels, users);
 }

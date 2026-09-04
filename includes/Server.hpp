@@ -67,8 +67,9 @@ class Server
 {
     private :
 
-        // stores objects
-        std::map<std::string, Channel*> _channels;
+        // objects saving
+        std::map
+        <std::string, Channel*>     _channels;
         std::map<int, Client*>      _clients;
         
         // server password
@@ -83,7 +84,7 @@ class Server
         // Parser
         std::vector<std::string>    getArgsparse(std::string str, char sep);
         Channel*                    getChannelparse(std::string &str, size_t i);
-        std::vector<Channel *>*     getChannelListparse(Client *c, std::string &str, size_t &i);
+        std::vector<Channel*>*      getChannelListparse(Client *c, std::string &str, size_t &i);
 
         // Mode
         mode_s*                     getFlagMode(Channel *, Client *c, const std::string& str);
@@ -91,48 +92,50 @@ class Server
     public :
 
         // Constructor
-        Server(int port, std::string pass);
+                                    Server(int port, std::string pass);
 
         // Destructor
-        ~Server();
+                                    ~Server();
 
         // getters
-        inline const std::string getPassword() const;
-        int                      getEpollFd();
-        int                      getSocket();
-        std::vector<int>&        getfdList();
-        sockaddr_in              getAddress();
-        Client*                  getClient(std::string username, int fd, int mode);
-        cmdfunc	                 getcmd(std::string str);
-        Channel*                 getChannel(std::string name);
-        std::map<std::string, Channel *> &getChannelList();
+        std::map
+        <std::string, Channel*>&    getChannelList();
+        inline const std::string    getPassword() const;
+        int                         getEpollFd();
+        int                         getSocket();
+        std::vector<int>&           getfdList();
+        sockaddr_in                 getAddress();
+        Client*                     getClient(std::string username, int fd, int mode);
+        cmdfunc	                    getcmd(std::string str);
+        Channel*                    getChannel(std::string name);
 
         // setters
-        void    setPassword(std::string password);
-        Client* find_client(int fd);
+        void                        setPassword(std::string password);
 
         // utils
-        void	addClient(int client_fd);
-        void    HandleClient(Client *c);
-        void    addChannel(Channel *channel, std::string name);
-        void    addChannelName(Channel *chan);
-        int	    kickParser(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy);
-        void    removeClient(int fd);
-        int		callcmd(std::string str, Client &);
-        void    clean();
-
-        //reply
-        void    reply(Client *c, reply_flag flag, std::string msg);
-        void    replyChannel(Channel *c, std::string msg);
+        void	                    addClient(int client_fd);
+        void                        HandleClient(Client *c);
+        void                        addChannel(Channel *channel, std::string name);
+        void                        addChannelName(Channel *chan);
+        int	                        kickParser(std::string names, std::string reason, std::string channel, Client& c, size_t& i, std::string& str, size_t cpy);
+        void                        removeClient(int fd);
+        int		                    callcmd(std::string str, Client &);
+        void                        clean();
+        int                         newChannel(int i, std::string str, Client &c);
+        void	                    addToChan(Channel *chan, Client &c);
+        void                        reply(Client *c, reply_flag flag, std::string msg);
+        void                        replyChannel(Channel *c, std::string msg);
+        int                         chanCheck(Channel *chan, Client &c, int i, std::vector<std::string> args, int lenght_args);
+        void                        kickSingleChan(std::string str, size_t cpy, size_t i, Client& c, std::string reason, size_t lenght_user, std::vector<std::string> channels, std::vector<std::string> users);
 
         //command
-        void    invite(std::string &str, size_t &i, Client &);
-        void    kick(std::string &str, size_t &i, Client &);
-        void    topic(std::string &str, size_t &i, Client &);
-        void    mode(std::string &str, size_t &i, Client &);
-        void    pass(std::string &str, size_t &i, Client &);
-        void    nick(std::string &str, size_t &i, Client &);
-        void    user(std::string &str, size_t &i, Client &);
-        void    join(std::string &str, size_t &i, Client &);
-        void    privmsg(std::string &str, size_t &i, Client &);
+        void                        invite(std::string &str, size_t &i, Client &);
+        void                        kick(std::string &str, size_t &i, Client &);
+        void                        topic(std::string &str, size_t &i, Client &);
+        void                        mode(std::string &str, size_t &i, Client &);
+        void                        pass(std::string &str, size_t &i, Client &);
+        void                        nick(std::string &str, size_t &i, Client &);
+        void                        user(std::string &str, size_t &i, Client &);
+        void                        join(std::string &str, size_t &i, Client &);
+        void                        privmsg(std::string &str, size_t &i, Client &);
 };

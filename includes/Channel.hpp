@@ -45,45 +45,45 @@ class Channel
     public :
 
         // constructor
-        Channel(std::string name);
+                                        Channel(std::string name);
 
         // destructor
-        ~Channel();
+                                        ~Channel();
 
         // getters
-        std::string  getName();
-        std::string  getPassword();
-        Client*      getMember(std::string username);
-        std::map<std::string, Client*> getMembers();
-        Client*      getModerator(std::string username);
-        Client*      getInvited(std::string username);
-        bool         getPasswordRequirement();
-        bool         getInviteOnlyStatus();
-        bool         getTopicRestrictionStatus();
-        std::string  getTopic();
-        std::string  getTopicLastModifDate();
-        std::string  getTopicLastModifierUsername();
-        unsigned int getUserLimit();
-        std::string  getModesString();
+        std::string                     getName();
+        std::string                     getPassword();
+        Client*                         getMember(std::string username);
+        std::map<std::string, Client*>  getMembers();
+        Client*                         getModerator(std::string username);
+        Client*                         getInvited(std::string username);
+        bool                            getPasswordRequirement();
+        bool                            getInviteOnlyStatus();
+        bool                            getTopicRestrictionStatus();
+        std::string                     getTopic();
+        std::string                     getTopicLastModifDate();
+        std::string                     getTopicLastModifierUsername();
+        unsigned int                    getUserLimit();
+        std::string                     getModesString();
 
         // setters
-        void         setName(std::string name);
-        void         setPassword(std::string password);
-        void         setPasswordRequirement(bool status);
-        void         setInviteOnlyStatus(bool status);
-        void         setTopicRestrictionStatus(bool status);
-        void         setTopic(std::string topic);
-        void         setTopicLastModifDate(std::string date);
-        void         setTopicLastModifierUsername(std::string username);
-        void         setUserLimit(unsigned int limit);
+        void                            setName(std::string name);
+        void                            setPassword(std::string password);
+        void                            setPasswordRequirement(bool status);
+        void                            setInviteOnlyStatus(bool status);
+        void                            setTopicRestrictionStatus(bool status);
+        void                            setTopic(std::string topic);
+        void                            setTopicLastModifDate(std::string date);
+        void                            setTopicLastModifierUsername(std::string username);
+        void                            setUserLimit(unsigned int limit);
 
         // utils
-        void         addUser(Client *client);
-        void         addModerator(Client *);
-        void         addInvited(Client *);
-        void         delModerator(Client *);
-        void         delMember(Client *);
-        void         delInvited(Client *);
-        void         broadcast(std::string msg, int fd);
+        void                            addUser(Client *client);
+        void                            addModerator(Client *);
+        void                            addInvited(Client *);
+        void                            delModerator(Client *);
+        void                            delMember(Client *);
+        void                            delInvited(Client *);
+        void                            broadcast(std::string msg, int fd);
 };
 

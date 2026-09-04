@@ -15,6 +15,26 @@
 #include <ctime>
 
 /*
+	set_topic
+
+		This function is 
+		meant to set provided
+		topic to targeted 
+		channel
+*/
+void setTopic(Channel *chan, Client& c, std::string topic)
+{
+	chan->setTopic(topic);
+	chan->setTopicLastModifierUsername(c.getNickName());
+	std::ostringstream oss;
+	oss << std::time(NULL);
+	chan->setTopicLastModifDate(oss.str());
+	std::string msg = ":" + c.getNickName() + "!" + c.getUserName() +
+						  "@localhost TOPIC " + chan->getName() + " :" + topic + "\r\n";
+	chan->broadcast(msg, -1);
+}
+
+/*
 	topic
 
 		This function is meant to
@@ -107,12 +127,5 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		attributes and
 		broadcasting
 	*/
-	chan->setTopic(topic);
-	chan->setTopicLastModifierUsername(c.getNickName());
-	std::ostringstream oss;
-	oss << std::time(NULL);
-	chan->setTopicLastModifDate(oss.str());
-	std::string msg = ":" + c.getNickName() + "!" + c.getUserName() +
-						  "@localhost TOPIC " + chan->getName() + " :" + topic + "\r\n";
-	chan->broadcast(msg, -1);
+	setTopic(chan, c, topic);
 }

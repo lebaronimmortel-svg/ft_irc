@@ -12,13 +12,26 @@
 
 #include "../includes/Server.hpp"
 #include "../includes/Client.hpp"
+
 #include <iostream>
 
 // print
 void print_header();
-void print_client_quit(std::string user, std::string nick, int fd);
-void print_new_connection(int client_fd);
 
+// events
+int	new_client(Server *serv, int server_socket);
+void socket_close(Server *serv, int fd);
+void client_close(Server *serv, Client *client, int fd);
+
+/*
+	main
+
+		This function is meant to
+		execute an infinite loop,
+		waiting for events to occur
+		on the server, then call
+		the appropriate function
+*/
 int main(int argc, char** argv)
 {
 	(void) argv;
@@ -68,28 +81,8 @@ int main(int argc, char** argv)
 				*/
 				if (fd == server_socket)
 				{
-					int client_fd = accept(server_socket, NULL, NULL);
-					if (client_fd == -1)
-						continue;
-					print_new_connection(client_fd);
-					
-					struct epoll_event client_event = 
-					{
-						.events = EPOLLIN | EPOLLET,
-						.data = 
-						{
-							.fd = client_fd,
-						}
-					};
-
-					if (epoll_ctl(serv.getEpollFd(), EPOLL_CTL_ADD, client_fd, &client_event) < 0)
-					{
-						close(client_fd);
-						throw std::runtime_error("Error adding client to the poll pool");
-					}
-					serv.getfdList().push_back(client_fd);
-					serv.addClient(client_fd);
-
+					if (new_client(&serv, server_socket))
+						continue ;
 				}
 
 				/*
@@ -112,14 +105,7 @@ int main(int argc, char** argv)
 					*/
 					if (bytes_read == 0)
 					{
-						std::string user = client->getUserName();
-						std::string nick = client->getNickName();	
-						epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
-						close(fd);
-						serv.removeClient(fd);
-						client->leaveAllChannels();
-						print_client_quit(user, nick, fd);
-						serv.clean();
+						client_close(&serv, client, fd);
 						continue ;
 					}
 
@@ -148,21 +134,11 @@ int main(int argc, char** argv)
 						transmission
 				*/
 				else if (events[i].events & (EPOLLERR | EPOLLHUP))
-				{
-					Client *client = serv.getClient("", fd, 1);
-					std::string user = client->getUserName();
-					std::string nick = client->getNickName();
-					epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
-					close(fd);
-					client->leaveAllChannels();
-					print_client_quit(user, nick, fd);
-					serv.removeClient(fd);
-					serv.clean();
-				}
-
+					socket_close(&serv, fd);
 			}
 		}
 	}
+	
 	catch (std::exception &e)
 	{
 		std::cerr << "Error :\n" << e.what() << std::endl;
