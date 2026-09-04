@@ -113,6 +113,7 @@ class Server
         void                        setPassword(std::string password);
 
         // utils
+        void                        free_all();
         void	                    addClient(int client_fd);
         void                        HandleClient(Client *c);
         void                        addChannel(Channel *channel, std::string name);

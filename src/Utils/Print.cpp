@@ -34,7 +34,7 @@ void print_auth(std::string username, std::string nickname, int fd)
     std::cout << BLUE << "║ New client joined server ║" << std::endl;
     std::cout << BLUE << "╚══════════════════════════╝" << RESET << std::endl;
     std ::cout << BLUE << "username: " << RESET << username << std::endl << BLUE << "nickname: " << RESET << nickname << std::endl;
-    std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;    
+    std::cout << BLUE << "fd: " << RESET << fd << std::endl << std::endl;    
 }
 
 void print_channel_deleted(std::map<std::string, Channel*>::iterator it)
@@ -52,7 +52,7 @@ void print_client_quit(std::string user, std::string nick, int fd)
 	std::cout << BLUE << "╚════════════════════╝" << RESET << std::endl;
 	std::cout << BLUE << "username: " << RESET << user << std::endl;
 	std::cout << BLUE << "nickname: " << RESET << nick << std::endl;
-	std::cout << BLUE << "fil_desc: " << RESET << fd << std::endl << std::endl;	
+	std::cout << BLUE << "fd: " << RESET << fd << std::endl << std::endl;	
 }
 
 void print_new_connection(int client_fd)
@@ -60,7 +60,7 @@ void print_new_connection(int client_fd)
 	std::cout << std::endl << BLUE << "╔═════════════════════════╗" << RESET << std::endl;
 	std::cout << BLUE << "║ New connection received ║" << std::endl;
 	std::cout << BLUE << "╚═════════════════════════╝" << RESET << std::endl;
-	std::cout << BLUE << "fil_desc: " << RESET << client_fd << std::endl << std::endl;	
+	std::cout << BLUE << "fd: " << RESET << client_fd << std::endl << std::endl;	
 }
 
 void print_new_channel(Client& c, Channel* nchan)

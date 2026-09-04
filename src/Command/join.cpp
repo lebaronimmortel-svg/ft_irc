@@ -167,4 +167,5 @@ void Server::join(std::string &str, size_t &i, Client &c)
 			addToChan(chan, c);
 		}
 	}
+	delete channels;
 }

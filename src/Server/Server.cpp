@@ -212,7 +212,7 @@ Client* Server::getClient(std::string nickname, int fd, int mode)
 void Server::addClient(int client_fd)
 {
 	Client *client = new Client(client_fd);
-	_clients.insert(std::make_pair(client_fd ,client));
+	_clients.insert(std::make_pair(client_fd, client));
 }
 
 /*
@@ -220,6 +220,7 @@ void Server::addClient(int client_fd)
 */
 void	Server::removeClient(int fd)
 {
+	delete _clients.find(fd)->second;
 	_clients.erase(fd);
 }
 
@@ -269,12 +270,6 @@ cmdfunc Server::getcmd(std::string str)
 int Server::callcmd(std::string str, Client &c)
 {
 	cmdfunc func = this->getcmd(str);
-
-	// debug
-
-	std::cout << str << std::endl;
-
-	// debug
 
 	if (!func)
 	{
@@ -429,6 +424,7 @@ void Server::clean()
         if (chan != NULL && chan->getMembers().empty())
         {
 			print_channel_deleted(it);
+			delete chan;
             _channels.erase(it++);
         }
         else
@@ -458,6 +454,27 @@ void Server::replyChannel(Channel *chan, std::string msg)
 	for (std::map<std::string, Client *>::iterator it = mem.begin(); it != end; it++)
 		send((*it).second->getFd(), msg.c_str(), msg.size(), 0);
 }
+
+/*
+	free_all
+
+void Server::free_all()
+{
+	std::map<int, Client*>::iterator it;
+    for (it = this->_clients.begin(); it != this->_clients.end(); ++it)
+    {
+		delete it->second;
+    }
+	this->_clients.clear();
+
+	std::map<std::string, Channel*>::iterator it2;
+    for (it2 = this->_channels.begin(); it2 != this->_channels.end(); ++it2)
+    {
+		delete it2->second;
+    }
+	this->_channels.clear();
+}
+*/
 
 /*
 	handle_client

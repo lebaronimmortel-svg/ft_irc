@@ -118,6 +118,14 @@ std::string &Client::getBuffer()
 }
 
 /*
+    get_channels
+*/
+std::map<std::string, Channel*> &Client::getChannels()
+{
+    return _channels;
+}
+
+/*
     set_nickname
 */
 void Client::setNickName(std::string nickname)

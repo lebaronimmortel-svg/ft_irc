@@ -82,6 +82,7 @@ void socket_close(Server *serv, int fd)
 	Client *client = serv->getClient("", fd, 1);
 	std::string user = client->getUserName();
 	std::string nick = client->getNickName();
+	std::map<std::string, Channel*>::iterator it2;
 	epoll_ctl(serv->getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
 	close(fd);
 	client->leaveAllChannels();

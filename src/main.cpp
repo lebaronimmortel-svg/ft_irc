@@ -29,11 +29,6 @@ void handler(int sig)
 	(void) sig;
 }
 
-static void free_all(Server *serv)
-{
-	// delete la memoire
-}
-
 /*
 	main
 
@@ -79,7 +74,6 @@ int main(int argc, char** argv)
 			int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
 			if (ready == -1)
 			{
-				free_all(&serv);
 				break;
 			}
 
