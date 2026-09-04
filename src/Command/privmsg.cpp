@@ -40,7 +40,7 @@ void Server::privmsg(std::string &str, size_t &i, Client &c)
         i++;
     if (i >= length || str[i] == ':')
     {
-        this->reply(&c, ERR_NORECIPIENT, ":No recipient given (PRIVMSG)");
+        this->reply(&c, ERR_NORECIPIENT, ":No recipient given");
         return;
     }
 

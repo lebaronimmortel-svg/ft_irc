@@ -13,6 +13,7 @@
 #include "../includes/Server.hpp"
 #include "../includes/Client.hpp"
 
+#include <signal.h>
 #include <iostream>
 
 // print
@@ -22,6 +23,16 @@ void print_header();
 int	new_client(Server *serv, int server_socket);
 void socket_close(Server *serv, int fd);
 void client_close(Server *serv, Client *client, int fd);
+
+void handler(int sig)
+{
+	(void) sig;
+}
+
+static void free_all(Server *serv)
+{
+	// delete la memoire
+}
 
 /*
 	main
@@ -49,7 +60,8 @@ int main(int argc, char** argv)
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
 	}
-
+;
+	signal(SIGINT, handler);
 	print_header();
 
 	try
@@ -66,7 +78,10 @@ int main(int argc, char** argv)
 			*/
 			int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
 			if (ready == -1)
+			{
+				free_all(&serv);
 				break;
+			}
 
 			for (int i = 0; i < ready; i++)
 			{
