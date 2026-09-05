@@ -73,9 +73,7 @@ int main(int argc, char** argv)
 			*/
 			int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
 			if (ready == -1)
-			{
 				break;
-			}
 
 			for (int i = 0; i < ready; i++)
 			{
@@ -143,7 +141,10 @@ int main(int argc, char** argv)
 						transmission
 				*/
 				else if (events[i].events & (EPOLLERR | EPOLLHUP))
-					socket_close(&serv, fd);
+				{
+					Client *client = serv.getClient("", fd, 1);
+					client_close(&serv, client, fd);
+				}
 			}
 		}
 	}

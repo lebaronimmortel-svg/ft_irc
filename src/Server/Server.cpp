@@ -133,7 +133,7 @@ Server::Server(int port, std::string pass): _password(pass)
 {
 	this->_servsock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (this->_servsock < 0)
-		throw std::runtime_error("Error Initialization socket");
+		throw std::runtime_error("Error Initializing socket");
 	this->_servaddr = (struct sockaddr_in)
 	{
 		.sin_family = AF_INET,
@@ -158,7 +158,7 @@ Server::Server(int port, std::string pass): _password(pass)
 	if (this->_epollfdserv < 0)
 	{
 		close(this->_epollfdserv);
-		throw std::runtime_error("Error Initialization Epoll");
+		throw std::runtime_error("Error Initializing Epoll");
 	}
 	struct epoll_event serv_event = 
 	{
@@ -257,7 +257,8 @@ cmdfunc Server::getcmd(std::string str)
 	if (sep == str.npos)
 		sep = str.length();
 	std::string cmd = str.substr(slash, sep);
-	for (int i = 0; i < PRIVMSG + 1; i++){
+	for (int i = 0; i < PRIVMSG + 1; i++)
+	{
 		if (cmdPfx(cmd) ==  cmdLU[i].name)
 			return cmdLU[i].call;
 	}
@@ -387,7 +388,7 @@ Channel* Server::getChannel(std::string name)
 int Server::getEpollFd()
 {
 	return this->_epollfdserv;
-};
+}
 
 /*
 	get_socket
@@ -395,7 +396,7 @@ int Server::getEpollFd()
 int Server::getSocket() 
 {
 	return this->_servsock;
-};
+}
 
 /*
 	get_fd_list
@@ -403,8 +404,11 @@ int Server::getSocket()
 std::vector<int> &Server::getfdList()
 {
 	return this->_epollfd;
-};
+}
 
+/*
+	get_address
+*/
 sockaddr_in Server::getAddress() 
 {
 	return this->_servaddr;
@@ -412,7 +416,7 @@ sockaddr_in Server::getAddress()
 
 /*
 	clean
-	(closes empty channels)
+	(deletes empty channels)
 */
 void Server::clean()
 {
@@ -454,27 +458,6 @@ void Server::replyChannel(Channel *chan, std::string msg)
 	for (std::map<std::string, Client *>::iterator it = mem.begin(); it != end; it++)
 		send((*it).second->getFd(), msg.c_str(), msg.size(), 0);
 }
-
-/*
-	free_all
-
-void Server::free_all()
-{
-	std::map<int, Client*>::iterator it;
-    for (it = this->_clients.begin(); it != this->_clients.end(); ++it)
-    {
-		delete it->second;
-    }
-	this->_clients.clear();
-
-	std::map<std::string, Channel*>::iterator it2;
-    for (it2 = this->_channels.begin(); it2 != this->_channels.end(); ++it2)
-    {
-		delete it2->second;
-    }
-	this->_channels.clear();
-}
-*/
 
 /*
 	handle_client

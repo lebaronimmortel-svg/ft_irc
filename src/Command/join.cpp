@@ -162,7 +162,7 @@ void Server::join(std::string &str, size_t &i, Client &c)
 		*/
 		else
 		{
-			if (chanCheck(chan, c, i, args, lenght_args))
+			if (!chanCheck(chan, c, i, args, lenght_args))
 				continue ;
 			addToChan(chan, c);
 		}

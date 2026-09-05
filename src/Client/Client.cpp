@@ -236,7 +236,7 @@ void Client::addChannelInv(Channel* chan)
 /*
     delete_channel_invited
 */
-void    Client::delInvChan(Channel *channel)
+void Client::delInvChan(Channel *channel)
 {
     try 
     {

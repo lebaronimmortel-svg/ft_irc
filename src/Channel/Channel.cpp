@@ -279,6 +279,7 @@ void Channel::delMember(Client *c)
     {
         this->_members.at(c->getNickName());
         this->_members.erase(c->getNickName());
+        c->delChannel(this);
         if (this->_moderators.find(c->getNickName()) != this->_moderators.end())
             delModerator(c);
         print_del_member(_name, c->getNickName());
@@ -294,11 +295,13 @@ void Channel::delMember(Client *c)
 */
 void Channel::delInvited(Client *c)
 {
-    try {
+    try
+    {
         this->_invited.at(c->getNickName());
         this->_invited.erase(c->getNickName());
     }
-    catch (std::exception &e){
+    catch (std::exception &e)
+    {
         return ;
     }
 }
