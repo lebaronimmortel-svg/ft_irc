@@ -233,6 +233,14 @@ std::map<std::string, Channel *> &Server::getChannelList()
 }
 
 /*
+	get_clients_list
+*/
+std::map<int, Client *> &Server::getClientList()
+{
+	return this->_clients;
+}
+
+/*
 	add_channel_name
 */
 void Server::addChannelName(Channel *chan)

@@ -27,7 +27,7 @@ Channel::~Channel() {}
 /*
     Constructor
 */
-Channel::Channel(std::string name) : _name(name), _requires_password(0), _invite_only_mod(0), _user_limit(0) {}
+Channel::Channel(std::string name) : _name(name), _requires_password(0), _invite_only_mod(0), _topic_restriction(0), _user_limit(0) {}
 
 /*
     get_name

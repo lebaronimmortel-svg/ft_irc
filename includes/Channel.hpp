@@ -40,7 +40,7 @@ class Channel
         std::string                    _topic_last_modifier_username;
 
         // max number of users allowed (0 == no limit)
-        unsigned int _user_limit;
+        unsigned int                    _user_limit;
 
     public :
 

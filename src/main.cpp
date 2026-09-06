@@ -24,6 +24,27 @@ int	new_client(Server *serv, int server_socket);
 void socket_close(Server *serv, int fd);
 void client_close(Server *serv, Client *client, int fd);
 
+void	free_server_memory(Server *serv)
+{
+    std::map<std::string, Channel*>::iterator it = serv->getChannelList().begin();
+    std::map<std::string, Channel*>::iterator it2 = serv->getChannelList().end();
+    while (it != it2)
+    {
+		delete it->second;
+		it++;
+    }
+	serv->getChannelList().clear();
+
+	std::map<int, Client*>::iterator it3 = serv->getClientList().begin();
+    std::map<int, Client*>::iterator it4 = serv->getClientList().end();
+    while (it3 != it4)
+    {
+		delete it3->second;
+		it3++;
+    }
+	serv->getClientList().clear();
+}
+
 void handler(int sig)
 {
 	(void) sig;
@@ -72,8 +93,11 @@ int main(int argc, char** argv)
 				to be sent to server
 			*/
 			int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
-			if (ready == -1)
+			if (ready == -1) // server ends before clients
+			{
+				free_server_memory(&serv);
 				break;
+			}
 
 			for (int i = 0; i < ready; i++)
 			{

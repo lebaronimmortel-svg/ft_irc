@@ -70,7 +70,8 @@ class Server
         // objects saving
         std::map
         <std::string, Channel*>     _channels;
-        std::map<int, Client*>      _clients;
+        std::map
+        <int, Client*>              _clients;
         
         // server password
         std::string                 _password;
@@ -100,6 +101,8 @@ class Server
         // getters
         std::map
         <std::string, Channel*>&    getChannelList();
+        std::map
+        <int, Client*>&             getClientList();
         inline const std::string    getPassword() const;
         int                         getEpollFd();
         int                         getSocket();
