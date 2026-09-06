@@ -8,6 +8,33 @@ std::string cmdSfxRefWord(std::string& str);
 int nb_first_sp(std::string str);
 
 /*
+    valid_flags
+
+        This function is meant
+        to extract from a MODE
+        command only valid flags 
+*/
+std::string valid_flags(std::string& str)
+{
+    std::string result = "";
+    int i = 5;
+
+    while (str[i] != ' ')
+        i++;
+    while (str[i] == ' ')
+        i++;
+    while (str[i] != ' ')
+    {
+        if (strchr("itkol", str[i]) != NULL || (( str[i] == '+' || str[i] == '-') && strchr("itkol", str[i + 1]) != NULL))
+        {
+            result += str[i];
+        }
+        i++;
+    }
+    return (result);
+}
+
+/*
     get_flag_mode
 
         This function is meant to 
@@ -270,8 +297,8 @@ void Server::mode(std::string &str, size_t &i, Client &c)
     /*
         Broadcast
     */
-    std::string broadcast_msg = ":" + c.getNickName() + "!" + c.getUserName() +
-                                "@localhost " + str + "\r\n";
+    std::string broadcast_msg = ":" + c.getNickName() + "!" + c.getUserName()
+                                + "@localhost " + valid_flags(str) + "\r\n";
     chan->broadcast(broadcast_msg, -1);
 
     delete (args);
