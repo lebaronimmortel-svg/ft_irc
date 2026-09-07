@@ -1,0 +1,3 @@
+- Régler les leaks (signaux -> capturer le ctrl-C)
+- Bot
+- Message en plusieurs envois (Ctrl-D) ? 

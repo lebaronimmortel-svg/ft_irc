@@ -6,36 +6,43 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/24 01:20:05 by tseche           ###   ########.fr       */
+/*   Updated: 2026/08/26 14:40:01 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/Command.hpp"
 #include "../../includes/Client.hpp"
 
-void Server::pass(std::string &str, int &i, Client &c){
-	int cpy = i;
-	Channel *chan = this->getChannelparse(str, i);
-	if (chan == NULL){
-		std::cerr << "Server: unknown channel:" + str.substr(cpy, i) + "\n" << std::flush;
+// parsing
+std::string cmdSfx(std::string str);
+
+// authentification
+void checkAuth(Server *serv, Client& c);
+void resetAuthLevel(Server* serv, Client& c, int mode);
+
+/*
+	password
+
+		This function is meant to execute
+		the PASS command from an IRC client:
+
+		PASS password
+*/
+void Server::pass(std::string &str, size_t &i, Client &c)
+{	
+	(void) i;
+
+	if (c.getAuthenticated())
+	{
+		this->reply(&c, ERR_ALREADYREGISTRED, "IRCServer: user already registered");
 		return ;
 	}
-	if (c.getAuthenticated()){
-		std::cerr << "PASS: user [" + c.getNickName() + "] is already register\n" << std::flush;
-		return ;
-	}
-	std::vector<std::string> args = this->getArgsparse(str, ' ', i);
-	if (args.size() != 1){
-		std::cerr << "Pass: require only one argument\n" << std::flush;
-		return ;
-	}
-	if (args.at(0) != chan->getPassword()){
-		std::cerr << "Pass: incorrect password provided\n" << std::flush;
-		return ;
-	};
-	c.getAuthLevel() |= (1 << PASSWORD);
+
+	if (cmdSfx(str) == _password)
+		c.setPassAuth(1);
+	c.setAuthLevel(c.getAuthLevel() | (1 << PASSWORD));
+
 	size_t reqperm = (1 << PASSWORD) | (1 << NICKNAME) | (1 << USERNAME);
-	if ((c.getAuthenticated() & reqperm) == reqperm){
-		c.setAuthenticated(true);
-	} 
+	if ((c.getAuthLevel() & reqperm) == reqperm)
+		checkAuth(this, c);
 }

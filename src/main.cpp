@@ -1,116 +1,182 @@
-#include "../includes/Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
+/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../includes/Server.hpp"
+#include "../includes/Client.hpp"
+
+#include <signal.h>
+#include <iostream>
+
+// print
+void print_header();
+
+// events
+int	new_client(Server *serv, int server_socket);
+void socket_close(Server *serv, int fd);
+void client_close(Server *serv, Client *client, int fd);
+
+void	free_server_memory(Server *serv)
+{
+    std::map<std::string, Channel*>::iterator it = serv->getChannelList().begin();
+    std::map<std::string, Channel*>::iterator it2 = serv->getChannelList().end();
+    while (it != it2)
+    {
+		delete it->second;
+		it++;
+    }
+	serv->getChannelList().clear();
+
+	std::map<int, Client*>::iterator it3 = serv->getClientList().begin();
+    std::map<int, Client*>::iterator it4 = serv->getClientList().end();
+    while (it3 != it4)
+    {
+		delete it3->second;
+		it3++;
+    }
+	serv->getClientList().clear();
+}
+
+void handler(int sig)
+{
+	(void) sig;
+}
+
+/*
+	main
+
+		This function is meant to
+		execute an infinite loop,
+		waiting for events to occur
+		on the server, then call
+		the appropriate function
+*/
 int main(int argc, char** argv)
 {
 	(void) argv;
-
-	if (argc != 3 || !parse_arg(argv[1]))
+	if (argc != 3)
 	{
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
-		return (-1);
+		return (1);
 	}
 
-	Server serv(atoi(argv[1]), argv[2]);
-	int server_socket = serv.getSocket();
-	sockaddr_in server_adrres = serv.getAddress();
-
-	struct epoll_event events[MAX_EVENT];
-	while (1)
+	size_t port;
+	std::istringstream oss(argv[1]);
+	oss >> port;
+	if (oss.fail() || !oss.eof())
 	{
-		int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
-		if (ready == -1)
-			break;
+		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
+		return (1);
+	}
+;
+	signal(SIGINT, handler);
+	print_header();
 
-		for (int i = 0; i < ready; i++)
+	try
+	{
+		Server serv(port, argv[2]);
+		int server_socket = serv.getSocket();
+		struct epoll_event events[MAX_EVENT];
+		
+		while (1)
 		{
-			char *buf = NULL;
-			int fd = events[i].data.fd;
-
-			if (fd == server_socket) // new client
+			/*
+				waiting for new data
+				to be sent to server
+			*/
+			int ready = epoll_wait(serv.getEpollFd(), events, MAX_EVENT, TIMEOUT);
+			if (ready == -1) // server ends before clients
 			{
-				struct sockaddr_in client_addr;
-				socklen_t client_len = sizeof(client_addr);
-
-				int client_fd = accept4(server_socket, (sockaddr *)&server_adrres, &client_len, SOCK_NONBLOCK);
-				if (client_fd == -1)
-					continue;
-
-				struct epoll_event client_event = 
-				{
-					.events = EPOLLIN | EPOLLET,
-					.data.fd = client_fd,
-				};
-
-				if (epoll_ctl(serv.getEpollFd(), EPOLL_CTL_ADD, client_fd, &client_event) < 0)
-				{
-					close(client_fd);
-					throw std::runtime_error("Error adding client to the poll pool"); // voir si throw ou pas
-				}
-			} 
-
-			else if (events[i].events & EPOLLIN)
-			{
-				// read socket client -> events[i].data.fd
-				// with \r\n
-				ssize_t bytes_read = recv(events[i].data.fd, buf, sizeof(buf), 0);
-				Client *client = serv.get_client("", events[i].data.fd, 1);
-				if (!client)
-				{
-					std::string nick = parse_auth(buf, 0);
-					std::string user = parse_auth(buf, 1);
-					std::string full = parse_auth(buf, 2);
-					if (!user.empty() && !serv.get_client(user, 0, 0))
-						serv.addClient(events[i].data.fd, nick, user, full);
-					else
-					{
-						std::cerr << "Error adding user" << user << " to the server: ";
-						if (user.empty())
-							std::cerr << "Wrong authentification syntax";
-						else if (serv.get_client(user, 0, 0))
-							std::cerr << "Username already in use";
-						std::cerr << std::endl;
-					}
-				}
-				else // traiter la commande
-				{		
-					if (!ft_strncmp(buf, "JOIN ", 5))
-					{
-						// cmd channel
-						std::string cmd = chan_join_cmd(buf);
-						if (!cmd.empty())
-						{
-							Channel *chan = serv.get_channel(cmd);
-							if (!chan)
-							{
-								chan = new Channel(cmd);
-								serv.addChannel(chan, cmd);
-							}
-							chan->addUser(client);
-							client->addChannel(chan);
-						}
-						else
-						{
-							// Unknown command
-						}
-					}
-					else if (!ft_strncmp(buf, "NICK ", 5))
-					{
-						std::string nick = nick_cmd(buf);
-						if (!nick.empty())
-							client->setNickName(nick);
-						else
-						{
-							// Unknown command
-						}
-					}
-				}
+				free_server_memory(&serv);
+				break;
 			}
-			else if (events[i].events & (EPOLLERR | EPOLLHUP)) // client close the socket before the end of the transmission
+
+			for (int i = 0; i < ready; i++)
 			{
-				close(fd);
-				epoll_ctl(serv.getEpollFd(), EPOLL_CTL_DEL, fd, NULL);
+				int fd = events[i].data.fd;
+
+				/*
+					case 1 :
+
+						new socket has
+						connected to the 
+						server
+				*/
+				if (fd == server_socket)
+				{
+					if (new_client(&serv, server_socket))
+						continue ;
+				}
+
+				/*
+					case 2 :
+
+						some data has been send
+						on this file descriptor
+				*/
+				else if (events[i].events & EPOLLIN)
+				{
+					char buff[4097];
+					Client *client = serv.getClient("", fd, 1);
+					ssize_t bytes_read = recv(fd, buff, sizeof(buff), 0);
+
+					/*
+						case 1 :
+
+							client has closed
+							transmission
+					*/
+					if (bytes_read == 0)
+					{
+						client_close(&serv, client, fd);
+						continue ;
+					}
+
+					/*
+						case 2 :
+
+							client sent
+							some text
+					*/
+					else if (bytes_read > 0)
+					{
+						if (bytes_read < 4097)
+							buff[bytes_read] = '\0';
+						else
+							buff[4096] = '\0';
+						client->getBuffer().append(buff);
+						serv.HandleClient(client);
+					}
+				}
+
+				/*
+					case 3 :
+
+						client closes the socket
+						before the end of the
+						transmission
+				*/
+				else if (events[i].events & (EPOLLERR | EPOLLHUP))
+				{
+					Client *client = serv.getClient("", fd, 1);
+					client_close(&serv, client, fd);
+				}
 			}
 		}
+	}
+	
+	catch (std::exception &e)
+	{
+		std::cerr << "Error :\n" << e.what() << std::endl;
+		return (-1);
 	}
 
 	return (0);
