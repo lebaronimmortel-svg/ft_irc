@@ -2,6 +2,7 @@
 #include "../../includes/Command.hpp"
 #include <cstring>
 #include <sstream>
+#include <cstring>
 
 // parsing
 std::string cmdSfxRefWord(std::string& str);
@@ -131,7 +132,23 @@ mode_s *Server::getFlagMode(Channel *chan, Client *c, const std::string &params)
     if (!has_sign && order.empty() && args->flag.i == -1 && args->flag.t == -1)
     {
         delete args;
-        this->reply(c, ERR_NEEDMOREPARAMS, chan->getName() + " :Not enough parameters");
+        std::string flag;
+        flag += chan->getPasswordRequirement() ? "(+k), " : "(-k), ";
+        flag += chan->getInviteOnlyStatus() ? "(+i), " : "(-i), ";
+        int limit = chan->getUserLimit();
+        std::stringstream ss;
+        ss << limit;
+        struct convert{
+            std::string operator()(std::stringstream &ss){
+                return (ss.fail() || !ss.eof()) ? "conversion error " : ss.str();
+            }
+        };
+        convert valeur;
+        flag += valeur(ss);
+        flag += (chan->getModerator(c->getUserName()) == NULL) ? "(+o), " : "(-o), ";
+        flag += chan->getTopicRestrictionStatus() ? "(+t), " : "(-t)";
+        std::string msg = ":" + chan->getName() + ": " + flag + "\r\n";
+        this->reply(c, RPL_CHANNELMODEIS, msg);
         return NULL;
     }
     
@@ -297,9 +314,8 @@ void Server::mode(std::string &str, size_t &i, Client &c)
     /*
         Broadcast
     */
-    std::string broadcast_msg = ":" + c.getNickName() + "!" + c.getUserName()
+    std::string broadcast_msg =  ":" + c.getNickName() + "!" + c.getUserName()
                                 + "@localhost " + valid_flags(str) + "\r\n";
-    chan->broadcast(broadcast_msg, -1);
-
+    chan->broadcast(broadcast_msg, -1);\
     delete (args);
 }

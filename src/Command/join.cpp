@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/26 14:40:27 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/07 18:51:58 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ int Server::chanCheck(Channel *chan, Client &c, int i, std::vector<std::string> 
 			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() + ": cannot join channel (+k)");
 			return 0;
 		}
-	}	
+	}
 	return 1;
 }
 
