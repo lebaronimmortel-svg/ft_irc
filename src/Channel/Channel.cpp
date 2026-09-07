@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexfuen <marvin@d42.fr>                   +#+  +:+       +#+        */
+/*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/01 21:56:22 by alexfuen          #+#    #+#             */
-/*   Updated: 2026/09/01 21:56:37 by alexfuen         ###   ########.fr       */
+/*   Updated: 2026/09/07 11:16:18 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,7 +313,8 @@ void Channel::broadcast(std::string msg, int fd)
 {
     for (std::map<std::string, Client *>::iterator i = _members.begin(); i != _members.end(); i++)
     {
-        if (i->second->getFd() != fd)
+        if (i->second->getFd() != fd){
             send(i->second->getFd(), msg.c_str(), msg.size(), 0);
+        }
     }
 }

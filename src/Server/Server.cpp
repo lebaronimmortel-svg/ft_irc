@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/26 16:12:06 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/07 10:53:33 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,6 +185,7 @@ Server::~Server()
 	size_t size = this->_epollfd.size();
 	for (size_t i = 0; i < size; i++)
 		close(this->_epollfd[i]);
+	close(this->_servsock);
 }
 
 /*
