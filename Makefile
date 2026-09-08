@@ -6,7 +6,7 @@
 #    By: tseche <tseche@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/13 23:39:11 by tseche            #+#    #+#              #
-#    Updated: 2026/09/08 17:14:49 by tseche           ###   ########.fr        #
+#    Updated: 2026/09/08 17:54:57 by tseche           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,7 @@ $(OBJ_DIR)/%.o : %.cpp
 clean:
 	@printf "$(RED)🧹 Cleaning...$(NC)\n"
 	@rm -rf ./obj/
-	@rm connect
+	@rm -f connect
 
 fclean: clean
 	@printf "$(RED)🗑️ Removing Executable $(NAME)...$(NC)\n"
