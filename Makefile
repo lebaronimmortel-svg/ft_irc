@@ -6,7 +6,7 @@
 #    By: tseche <tseche@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/13 23:39:11 by tseche            #+#    #+#              #
-#    Updated: 2026/08/26 15:42:26 by tseche           ###   ########.fr        #
+#    Updated: 2026/09/08 17:14:49 by tseche           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -66,6 +66,7 @@ $(NAME): $(OBJS)
 	@printf "$(BLUE)🔗 Creating Executable $@...$(NC)\n"
 	@$(CC) $(OBJS) -o $(NAME)
 	@printf "$(GREEN)✅ Created $@$(NC)\n"
+	@echo "PASS pass\nNICK John\nUSER a a a a" > connect
 	
 $(OBJ_DIR)/%.o : %.cpp
 	@mkdir -p $(OBJ_DIR)
@@ -75,6 +76,7 @@ $(OBJ_DIR)/%.o : %.cpp
 clean:
 	@printf "$(RED)🧹 Cleaning...$(NC)\n"
 	@rm -rf ./obj/
+	@rm connect
 
 fclean: clean
 	@printf "$(RED)🗑️ Removing Executable $(NAME)...$(NC)\n"

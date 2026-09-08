@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/08/26 14:40:10 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/08 17:13:51 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,7 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		return ;
 	}
 
-	std::vector<std::string> arg = this->getArgsparse(str, ' ');
-
+	std::vector<std::string> arg = this->getArgsparse(str.substr(cpy + chan->getName().length() + 1), ' ');
 	if (arg.size() == 0)
 	{
 		if (chan->getTopic().empty())
@@ -101,21 +100,25 @@ void Server::topic(std::string &str, size_t &i, Client &c)
 		topic message
 	*/
 	std::string topic;
-	if (arg.size() >= 3)
+	if (arg.size() == 1)
 	{
-		if (arg.at(2)[0] == ':')
+		size_t i = 0;
+		for (; i < arg[0].size();){
+			if (isspace(arg[0][i]))
+				i++;
+			else
+				break;
+		}
+		if (arg.at(0)[i] == ':')
 		{
-			topic = arg.at(2).substr(1);
-			for (size_t j = 3; j < arg.size(); j++)
-				topic += " " + arg.at(j);
+			topic = arg[0].substr(i + 1);
 		}
 		else 
 		{
-			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": no message provided");
+			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": no topic provided");
 			return ;	
 		}
 	}
-
 	else
 	{
 		this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() +  ": invalid parameters");
