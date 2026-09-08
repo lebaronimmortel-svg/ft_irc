@@ -65,6 +65,7 @@ class Channel
         std::string                     getTopicLastModifierUsername();
         unsigned int                    getUserLimit();
         std::string                     getModesString();
+        std::string                     getCurrentFlags(Client *c);
 
         // setters
         void                            setName(std::string name);

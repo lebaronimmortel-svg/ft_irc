@@ -229,6 +229,33 @@ void    Channel::setUserLimit(unsigned int limit)
     _user_limit = limit;
 }
 
+std::string Channel::getCurrentFlags(Client *c)
+{
+    std::string res = "";
+
+    if (_invite_only_mod)
+        res += "+i";
+    else
+        res += "-i";
+    if (_topic_restriction)
+        res += "+t";
+    else
+        res += "-t";
+    if (_requires_password)
+        res += "+k";
+    else
+        res += "-k";
+    if (_user_limit)
+        res += "+l";
+    else
+        res += "-l";
+    if (getModerator(c->getNickName()))
+        res += "+o";
+    else
+        res += "-o";
+    return (res);
+}
+
 /*
     add_user
 */

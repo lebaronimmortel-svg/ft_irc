@@ -225,11 +225,12 @@ void Server::mode(std::string &str, size_t &i, Client &c)
         Extracting targeted users
         from provided input
     */
-    size_t param_start = names.size() + 5 + nb_first_sp(str); //
-    if (param_start == std::string::npos)
+    size_t param_start = names.size() + 5 + nb_first_sp(str);
+
+    if (str.size() <= param_start + 1)
     {
-        this->reply(&c, RPL_CHANNELMODEIS, chan->getName() + ": no target provided");
-        return;
+        this->reply(&c, ERR_CHANOPRIVSNEEDED, chan->getName() + ": " + chan->getCurrentFlags(&c));
+        return ;
     }
 
     if (chan->getModerator(c.getNickName()) == NULL)
