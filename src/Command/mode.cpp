@@ -19,12 +19,13 @@ std::string valid_flags(std::string& str)
 {
     std::string result = "";
     int i = 5;
+    int len = str.size();
 
-    while (str[i] != ' ')
+    while (i < len && str[i] != ' ')
         i++;
-    while (str[i] == ' ')
+    while (i < len && str[i] == ' ')
         i++;
-    while (str[i] != ' ')
+    while (i < len && str[i] != ' ')
     {
         if (strchr("itkol", str[i]) != NULL || (( str[i] == '+' || str[i] == '-') && strchr("itkol", str[i + 1]) != NULL))
         {
