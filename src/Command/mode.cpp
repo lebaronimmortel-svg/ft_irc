@@ -156,34 +156,49 @@ mode_s *Server::getFlagMode(Channel *chan, Client *c, const std::string &params)
     /*
         Retrieving targets
     */
-    std::vector<std::string> wvec;
-    std::istringstream iss(params.substr(i));
-    std::string word;
-    while (iss >> word)
-        wvec.push_back(word);
-
+    std::string word(params.substr(i));
+    std::vector<std::string> wvec = this->getArgsparse(word, ' ');
     /*
         Attributing each 
         mode that implies
         a target to it
     */
-    size_t vec_i = 0;
     for (size_t y = 0; y < order.length(); y++)
     {
-        if (vec_i >= wvec.size())
-            break;
-
         char current = order[y];
-        if (current == 'k')
-            args->value.k = wvec.at(vec_i++);
-        else if (current == 'o')
-            args->value.o.push_back(wvec.at(vec_i++));
-        else if (current == 'l')
-        {
-            std::istringstream is(wvec.at(vec_i++));
-            is >> args->value.l;
-            if (is.fail() || !is.eof())
-                this->reply(c, ERR_UNKNOWNMODE, chan->getName() + " :invalid limit value");
+        if (current == 'k'){
+            try {
+                args->value.k = wvec.at(y++);
+            } catch(std::exception &e){
+                if (args->flag.k){
+                    this->reply(c, ERR_NEEDMOREPARAMS, ": need more parameter");
+                    delete args;
+                    return NULL;
+                }
+            }
+        }
+        else if (current == 'o'){
+            try {
+                args->value.o.push_back(wvec.at(y++));
+            } catch (std::exception &e){
+                this->reply(c, ERR_NEEDMOREPARAMS, ": need more parameter");
+                 delete args;
+                return NULL;
+            }
+        }
+        else if (current == 'l'){
+            try {
+                std::istringstream is(wvec.at(y++));
+                is >> args->value.l;
+                if (is.fail() || !is.eof())
+                    this->reply(c, ERR_UNKNOWNMODE, chan->getName() + " :invalid limit value");
+            } catch (std::exception &e){
+                if (args->flag.l){
+                    this->reply(c, ERR_NEEDMOREPARAMS, ": need more parameter");
+                    delete args;
+                    return NULL;
+                }
+            }
         }
     }
     return (args);
@@ -307,6 +322,8 @@ void Server::mode(std::string &str, size_t &i, Client &c)
             {
                 if (chan->getModerator(args->value.o.at(idx)) != NULL)
                     chan->delModerator(client);
+                else
+                    this->reply(&c, ERR_USERSDONTMATCH, ": not an operator");
             }
             else
                 this->reply(&c, ERR_NOSUCHNICK, args->value.o.at(idx) + " :No such nick");
@@ -318,6 +335,6 @@ void Server::mode(std::string &str, size_t &i, Client &c)
     */
     std::string broadcast_msg =  ":" + c.getNickName() + "!" + c.getUserName()
                                 + "@localhost " + valid_flags(str) + "\r\n";
-    chan->broadcast(broadcast_msg, -1);\
+    chan->broadcast(broadcast_msg, -1);
     delete (args);
 }

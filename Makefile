@@ -6,7 +6,7 @@
 #    By: tseche <tseche@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/13 23:39:11 by tseche            #+#    #+#              #
-#    Updated: 2026/09/08 17:54:57 by tseche           ###   ########.fr        #
+#    Updated: 2026/09/08 22:44:05 by tseche           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -66,7 +66,7 @@ $(NAME): $(OBJS)
 	@printf "$(BLUE)🔗 Creating Executable $@...$(NC)\n"
 	@$(CC) $(OBJS) -o $(NAME)
 	@printf "$(GREEN)✅ Created $@$(NC)\n"
-	@echo "PASS pass\nNICK John\nUSER a a a a" > connect
+	@echo "#cat connect - | ./ircserv 127.0.0.1 6000\nPASS pass\nNICK John\nUSER a a a a" > connect
 	
 $(OBJ_DIR)/%.o : %.cpp
 	@mkdir -p $(OBJ_DIR)

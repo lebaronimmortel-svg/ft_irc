@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:09:18 by tseche            #+#    #+#             */
-/*   Updated: 2026/09/07 18:51:58 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/08 23:38:34 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,18 +83,18 @@ int Server::chanCheck(Channel *chan, Client &c, int i, std::vector<std::string> 
 	}
 	if (chan->getPasswordRequirement())
 	{
-		if (i < lenght_args)
+		if (i < lenght_args && i + 2 < lenght_args)
 		{
-			std::string key = args[i];
+			std::string key = args[i + 2];
 			if (chan->getPassword() != key)
 			{
-				this->reply(&c, ERR_PASSWDMISMATCH, chan->getName() + ": cannot join channel (+k)");
+				this->reply(&c, ERR_PASSWDMISMATCH, chan->getName() + ": password mismatch");
 				return 0;
 			}
 		} 
 		else 
-		{ 
-			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() + ": cannot join channel (+k)");
+		{
+			this->reply(&c, ERR_NEEDMOREPARAMS, chan->getName() + ": No key provided (+k)");
 			return 0;
 		}
 	}

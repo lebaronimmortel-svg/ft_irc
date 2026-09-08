@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/23 19:51:25 by tseche            #+#    #+#             */
-/*   Updated: 2026/09/08 17:58:40 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/08 23:24:10 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ void Server::user(std::string &str, size_t &i, Client &c)
 	std::vector<std::string> args = this->getArgsparse(str, ' ');
 	if (args.size() == 5)
 		c.setUserAuthTmp(1);
-	else
-		this->reply(&c, ERR_NEEDMOREPARAMS, ": invalid parameters");
 	c.setUserAuth(args[1]);
 	c.setAuthLevel(c.getAuthLevel() | (1 << USERNAME));
 
