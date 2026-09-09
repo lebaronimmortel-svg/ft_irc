@@ -6,7 +6,7 @@
 /*   By: tseche <tseche@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/18 15:05:09 by tseche            #+#    #+#             */
-/*   Updated: 2026/09/07 10:53:33 by tseche           ###   ########.fr       */
+/*   Updated: 2026/09/09 21:41:00 by tseche           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,6 +249,22 @@ void Server::addChannelName(Channel *chan)
 	this->_channels[chan->getName()] = chan;
 }
 
+char *toUpper(char *res, std::string &c){
+	int z = 0;
+	size_t lenght = c.length();
+	for (size_t i = 0; i < lenght; i++){
+		if (c[i] >= 'a' || c[i] <= 'z'){
+			char tmp = toupper(c[i]);
+			res[z] = tmp;
+		}
+		else
+			res[z] = c[i];
+		z++;
+	}
+	res[z] = '\0';
+	return res;
+}
+
 /*
 	get_command
 */
@@ -268,8 +284,12 @@ cmdfunc Server::getcmd(std::string str)
 	std::string cmd = str.substr(slash, sep);
 	for (int i = 0; i < PRIVMSG + 1; i++)
 	{
-		if (cmdPfx(cmd) ==  cmdLU[i].name)
+		char res[2000];
+		std::string tmp = cmdPfx(cmd);
+		if ((cmdPfx(cmd) == cmdLU[i].name) || (strncmp(toUpper(res, cmd), cmdLU[i].name.c_str(), tmp.length()) == 0))
+		{
 			return cmdLU[i].call;
+		}
 	}
 	return (NULL);
 }
@@ -478,6 +498,7 @@ void Server::HandleClient(Client *c)
 	while ((pos = buff.find("\r\n")) != buff.npos)
 	{
 		std::string line = buff.substr(0, pos);
+		std::cout << "line: '" << line << "'\n" << std::flush; 
 		buff.erase(0, pos + 2);
 		this->callcmd(line, *c);
 	}
