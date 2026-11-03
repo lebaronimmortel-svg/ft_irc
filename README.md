@@ -69,7 +69,7 @@ Functions are grouped by the library they come from.
 The project requires:
 
 - Make
-- A C++ compiler with C++98 support (`g++` or `clang++`)
+- Clang Compiler
 - Linux (`epoll`)
 - An IRC client for testing (HexChat, Irssi, LimeChat, or `nc`)
 

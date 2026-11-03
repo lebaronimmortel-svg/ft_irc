@@ -497,8 +497,7 @@ void Server::HandleClient(Client *c)
 	size_t pos;
 	while ((pos = buff.find("\r\n")) != buff.npos)
 	{
-		std::string line = buff.substr(0, pos);
-		std::cout << "line: '" << line << "'\n" << std::flush; 
+		std::string line = buff.substr(0, pos); 
 		buff.erase(0, pos + 2);
 		this->callcmd(line, *c);
 	}
