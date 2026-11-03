@@ -1,87 +1,123 @@
-*This project has been created as part of the 42 curriculum by alexfuen and tseche.*
+*This project has been created as part of the 42 curriculum by alexfuen, tseche.*
 
 # ft_irc
 
-## Description
-**ft_irc** is a C++ 98 implementation of an IRC (Internet Relay Chat) server. The goal of this project is to create a fully functional text-based communication server capable of handling multiple clients simultaneously via non-blocking TCP/IP sockets and I/O multiplexing (`poll()` or equivalent).
+# Description
 
-Clients can connect using a standard IRC client (e.g., HexChat, Irssi, LimeChat), authenticate with a password, set their nickname/username, create or join channels, send private messages, and execute operator commands.
+*ft_irc* is an IRC (Internet Relay Chat) server developed for the 42 `ft_irc` project.
+It is written in C++98 and handles multiple clients simultaneously through non-blocking TCP/IP sockets and I/O multiplexing with `epoll`.
 
-### Key Features
-- **Non-blocking I/O Architecture:** Single-threaded socket handling using `poll()` (or `select`/`epoll`/`kqueue`) without blocking or excessive CPU usage.
-- **Client Authentication & Registration:** Handled via standard `PASS`, `NICK`, and `USER` commands.
-- **Channel Operations:**
-  - Public and private messaging (`PRIVMSG`).
-  - Joining (`JOIN`) and leaving (`PART`/`QUIT`) channels.
-  - Automatic message broadcasting to channel members.
-- **Channel Operator Commands:**
-  - `KICK` — Eject a client from a channel.
-  - `INVITE` — Invite a user to an invite-only channel.
-  - `TOPIC` — View or change the channel topic.
-  - `MODE` — Manage channel modes:
-    - `i`: Set/remove Invite-only mode.
-    - `t`: Set/remove Topic protection (operators only).
-    - `k`: Set/remove Channel key (password).
-    - `o`: Give/take Channel operator status.
-    - `l`: Set/remove User limit for the channel.
-- **Robust Buffer Handling:** Command aggregation to handle partial data packets and network lag (e.g., handling commands fragmented across multiple `recv()` calls).
+Clients can connect with any standard IRC client (HexChat, Irssi, LimeChat, ...), authenticate with a password, register a nickname, create or join channels, exchange private messages and use channel operator commands.
+
+### Key concepts
+
+- Non-blocking sockets and event-driven architecture
+- I/O multiplexing with `epoll`
+- TCP stream buffering and partial command reassembly
+- Client registration and authentication
+- Channel management and operator privileges
+- IRC message formatting and reply codes
+
+### External functions
+
+Functions are grouped by the library they come from.
+
+**libc**
+
+* `socket`, `bind`, `listen`, `accept` — TCP server setup.
+* `recv`, `send` — client communication.
+* `close` — socket cleanup.
+* `signal` — graceful interruption handling.
+* `htons` — network byte order conversion.
+
+**epoll (Linux)**
+
+* `epoll_create1`, `epoll_ctl`, `epoll_wait` — event loop and file descriptor monitoring.
+
+### Libraries
+
+* `libc`
+* `libstdc++`
+
+## Team Information
+
+| Member | 42 login | Role | Main responsibilities |
+| --- | --- | --- | --- |
+| Alexandre | `alexfuen` | Developer | server core, epoll event loop, channel management, MODE
+| Titouan | `tseche` | Developer | command parsing, JOIN, USER, TOPIC, PRIVMSG, Makefile
+
+## Supported Commands
+
+| Command | Description |
+| --- | --- |
+| `PASS` | Provide the server password. |
+| `NICK` | Set or change the client nickname. |
+| `USER` | Register the client username. |
+| `JOIN` | Join an existing channel or create a new one. |
+| `PRIVMSG` | Send a private message to a user or a channel. |
+| `TOPIC` | View or change the topic of a channel. |
+| `KICK` | Eject a client from a channel. |
+| `INVITE` | Invite a user to a channel. |
+| `MODE` | Manage channel modes (`i`, `t`, `k`, `o`, `l`). |
 
 ---
 
-## Instructions
+# Instructions
 
-### Requirements
-- A C++ compiler with C++98 support (`g++` or `clang++`).
-- `make` utility.
-- An IRC client for testing (e.g., **HexChat**, **Irssi**, **LimeChat**, or `nc` / `netcat`).
+## Requirements
 
-### Compilation
-To compile the project, run:
+The project requires:
+
+- Make
+- A C++ compiler with C++98 support (`g++` or `clang++`)
+- Linux (`epoll`)
+- An IRC client for testing (HexChat, Irssi, LimeChat, or `nc`)
+
+---
+
+## Configuration
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+cd ft_irc
+```
+
+---
+
+## Start the Application
+
+Build with:
+
 ```bash
 make
 ```
+Then launch with:
+```bash
+./ircserv <port> <password>
+```
+For example:
+```bash
+./ircserv 6667 mysecretpassword
+```
 
-This generates the executable ircserv. Other standard Makefile rules include:
+You can also test raw TCP packets with `nc`:
+```bash
+nc -C 127.0.0.1 6667
+```
 
-    make clean — Removes object files.
-    make fclean — Removes object files and the ircserv executable.
-    make re — Recompiles the entire project.
-
-### Running the Server
-
-Run the executable with a listening port and a connection password:
-
-    ./ircserv <port> <password>
-
-Example : 
-
-    ./ircserv 6667 mysecretpassword
-
-### Testing with nc (Netcat)
-
-You can test raw TCP packet buffering using nc:
-
-    nc -C 127.0.0.1 6667
+---
 
 # Resources
 
-### IRC Standards
+Main documentation and references used during development:
 
-- **RFC 1459 — Internet Relay Chat Protocol**
+- RFC 1459 — Internet Relay Chat Protocol — https://www.rfc-editor.org/info/rfc1459/
+- Classes in C++ — https://en.cppreference.com/cpp/language/classes
+- Linux man pages — https://man7.org/linux/man-pages/
 
-    https://www.rfc-editor.org/info/rfc1459/
+## AI Usage
 
-- **RFC 2812 — Internet Relay Chat: Client Protocol**
-
-    https://www.rfc-editor.org/info/rfc2812/
-
-### Artificial Intelligence Usage
-
-In accordance with the 42 AI guidelines for this project, AI tools were utilized as follows:
-
-- **Documentation:** Used AI to find some specific information about a function, tool, concept.
-
-- **Architecture & Design:** Discussed non-blocking socket patterns, event loop design, and buffering strategy for fragmented TCP packets.
-
-- **Edge Case Identification:** Prompted AI to suggest potential edge cases regarding signal handling, socket disconnects, and unexpected client input formatting.
-
+AI tools were used as a supplementary resource during the project, mainly for technical research, troubleshooting, reviewing edge cases, checking project requirements and assisting with documentation.
+The team remained responsible for the technical decisions, implementation and final validation of the project.
